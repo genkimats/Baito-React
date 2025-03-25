@@ -16,34 +16,36 @@ function ManageWorkdayPage() {
     deleteWorkday,
   } = useBaitoContext();
   const initialDate = new Date();
+  const [selectedDay, setSelectedDay] = useState(initialDate.getDate());
   const [isAddMode, setIsAddMode] = useState(true); // true -> Add , false -> Remove
 
-  const onClickDay = () => {
-    alert("Clicked day!");
+  const handleDayClick = (date) => {
+    setSelectedDay(date);
+    console.log(selectedDay);
   };
 
   const handleToggle = (event) => {
     setIsAddMode(event.target.checked);
   };
-
-  const handleAdd = () => {
+  const handleAdd = (e) => {
+    e.preventDefault();
     alert("Added!");
 
     addWorkday({});
   };
 
-  const handleRemove = () => {
+  const handleRemove = (e) => {
+    e.preventDefault();
     alert("Removed!");
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = (e) => {
     if (isAddMode) {
-      handleAdd();
+      handleAdd(e);
     } else {
-      handleRemove();
+      handleRemove(e);
     }
   };
-
   return (
     <div>
       <div className="mode-switch">
@@ -69,8 +71,12 @@ function ManageWorkdayPage() {
       </div>
       <Calendar
         className={"react-calendar"}
-        onClickDay={onClickDay}
+        value={
+          new Date(savedDate.getFullYear(), savedDate.getMonth(), selectedDay)
+        }
+        onClickDay={handleDayClick}
         view="month"
+        showNeighboringMonth={false}
       ></Calendar>
 
       <div className="select-time">
