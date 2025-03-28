@@ -4,3 +4,11 @@
   /* justify-content: center; */
   gap: 2;
 }
+
+.start-time {
+  gap: 10;
+}
+
+.end-time {
+  padding: 5;
+}

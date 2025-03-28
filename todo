@@ -1,3 +1,2 @@
 Problems:
-  - selecting day requires two clicks
-  - selecting day does not activate the tile (react-calendar)
+  - cannot show the minutes in the TextFields
