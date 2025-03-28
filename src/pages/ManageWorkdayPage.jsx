@@ -98,7 +98,10 @@ function ManageWorkdayPage() {
 
   const handleRemove = (e) => {
     e.preventDefault();
-    alert("Removed!");
+    if (workdays.some((workday) => workday.day === selectedDay)) {
+      deleteWorkday(selectedDay);
+      alert("Removed!");
+    }
   };
 
   const handleConfirm = (e) => {

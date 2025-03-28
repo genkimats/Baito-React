@@ -42,8 +42,8 @@ export const BaitoManager = ({ children }) => {
     setWorkdays((prev) => prev.map((w) => (w.id === id ? updatedWorkday : w)));
   };
 
-  const deleteWorkday = (id) => {
-    setWorkdays((prev) => prev.filter((w) => w.id !== id));
+  const deleteWorkday = (day) => {
+    setWorkdays((prev) => prev.filter((w) => w.day !== day));
   };
 
   const value = {
