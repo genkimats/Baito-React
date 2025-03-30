@@ -6,10 +6,11 @@ export const useBaitoContext = () => useContext(BaitoContext);
 
 export const BaitoManager = ({ children }) => {
   // Configs
-  const DEFAULT_START_HOUR = 17;
-  const DEFAULT_START_MINUTE = 0;
-  const DEFAULT_END_HOUR = 22;
-  const DEFAULT_END_MINUTE = 0;
+  const DEFAULT_START_TIME = { hour: 17, minute: 0 };
+  const DEFAULT_END_TIME = { hour: 22, minute: 0 };
+
+  const WORKTIME_START = { hour: 17, minute: 0 };
+  const WORKTIME_END = { hour: 24, minute: 0 };
 
   const PAY_INTERVAL_MINUTES = 15;
 
@@ -38,8 +39,10 @@ export const BaitoManager = ({ children }) => {
     setWorkdays((prev) => [...prev, newWorkday]);
   };
 
-  const updateWorkday = (id, updatedWorkday) => {
-    setWorkdays((prev) => prev.map((w) => (w.id === id ? updatedWorkday : w)));
+  const updateWorkday = (day, updatedWorkday) => {
+    setWorkdays((prev) =>
+      prev.map((w) => (w.day === day ? updatedWorkday : w))
+    );
   };
 
   const deleteWorkday = (day) => {
@@ -47,10 +50,10 @@ export const BaitoManager = ({ children }) => {
   };
 
   const value = {
-    DEFAULT_START_HOUR,
-    DEFAULT_START_MINUTE,
-    DEFAULT_END_HOUR,
-    DEFAULT_END_MINUTE,
+    DEFAULT_START_TIME,
+    DEFAULT_END_TIME,
+    WORKTIME_START,
+    WORKTIME_END,
     PAY_INTERVAL_MINUTES,
     workdays,
     setWorkdays,

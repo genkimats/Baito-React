@@ -2,12 +2,18 @@
   width: 600px;
 
   .react-calendar__navigation {
+    display: flex;
     .react-calendar__navigation__arrow {
-      height: 32px;
+      height: 40px;
+      background-color: rgb(228, 228, 228);
+      color: black;
     }
 
     .react-calendar__navigation__label {
-      font-size: 23px;
+      font-size: 20px;
+      padding: 0px;
+      background-color: rgb(228, 228, 228);
+      color: black;
     }
   }
 
@@ -21,10 +27,12 @@
     justify-content: center;
     height: 30px;
     padding: 0;
+    background-color: rgb(228, 228, 228);
+    color: black;
   }
 
   .react-calendar__tile:hover {
-    background: rgb(0, 0, 128);
+    background: rgb(201, 203, 203);
   }
 
   .react-calendar__month-view__weekdays__weekday {

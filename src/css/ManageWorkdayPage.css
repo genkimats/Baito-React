@@ -1,14 +1,32 @@
+.main {
+  display: grid;
+  grid-gap: 15px;
+  grid-template-rows: 80px auto;
+  justify-items: center;
+  padding-top: 15px;
+}
+
 .mode-switch {
   display: flex;
   align-items: center;
-  /* justify-content: center; */
   gap: 2;
 }
 
+.calendar-container {
+  width: auto;
+  height: 250px;
+}
+
 .start-time {
+  display: flex;
   gap: 10;
+  padding: 10;
 }
 
 .end-time {
   padding: 5;
+}
+
+.classs1 {
+  background-color: black;
 }

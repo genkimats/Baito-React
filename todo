@@ -1,2 +1,10 @@
-Problems:
-  - cannot show the minutes in the TextFields
+TODO:
+
+- create SalaryPage
+
+Done:
+
+- set onChangeMonth to connect with the yearMonth
+- set worktime range
+- allow day selection using number (shortcut) only when focus is on the whole page (not focused on time selection)
+- fix conditional statement between active element and TextFields
