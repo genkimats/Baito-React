@@ -1,6 +1,6 @@
 import Calendar from "react-calendar";
 import "../css/Calendar.css";
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Switch,
   Typography,
@@ -8,6 +8,7 @@ import {
   TextField,
   MenuItem,
   Box,
+  Paper,
 } from "@mui/material";
 import "../css/ManageWorkdayPage.css";
 import { useBaitoContext } from "../context/BaitoContext";
@@ -74,6 +75,8 @@ function ManageWorkdayPage() {
 
   const handleKeyPress = useCallback(
     (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       if (e.key >= "0" && e.key <= "9") {
         const newBuffer = `${keyBuffer}${e.key}`.slice(-2);
         setKeyBuffer(newBuffer);
@@ -87,7 +90,6 @@ function ManageWorkdayPage() {
       } else if (e.key === "Tab") {
         e.preventDefault();
         const focusedElement = document.activeElement;
-        console.log(focusedElement);
         switch (focusedElement.id) {
           case "StartHour":
             startMinuteRef.current?.focus();
@@ -111,6 +113,7 @@ function ManageWorkdayPage() {
   );
 
   useEffect(() => {
+    setSavedDate(initialDate);
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [handleKeyPress]);
@@ -124,7 +127,6 @@ function ManageWorkdayPage() {
 
   const handleDayClick = (date) => {
     setSelectedDay(date.getDate());
-    console.log(calendarDate);
   };
 
   const handleTimeChange = (timeType, field) => (e) => {
@@ -142,69 +144,61 @@ function ManageWorkdayPage() {
     setIsAddMode(event.target.checked);
   };
 
-  const handleAdd = (e) => {
-    try {
-      e.preventDefault();
-    } finally {
+  const handleConfirm = (e) => {
+    e?.preventDefault?.();
+
+    const currentSelectedDay = selectedDay;
+    console.log(currentSelectedDay);
+
+    console.log(selectedDay);
+    if (isAddMode) {
       if (!workdays.some((workday) => workday.day === selectedDay)) {
         addWorkday({
-          day: parseInt(selectedDay),
+          day: selectedDay,
           startTime: startTime,
           endTime: endTime,
         });
       } else {
         updateWorkday(selectedDay, {
-          day: parseInt(selectedDay),
+          day: selectedDay,
           startTime: startTime,
           endTime: endTime,
         });
       }
-    }
-  };
-
-  const handleRemove = (e) => {
-    try {
-      e.preventDefault();
-    } finally {
+    } else {
       if (workdays.some((workday) => workday.day === selectedDay)) {
         deleteWorkday(selectedDay);
       }
     }
   };
 
-  const handleConfirm = (e) => {
-    try {
-      e.preventDefault();
-    } finally {
-      if (isAddMode) {
-        handleAdd(e);
-      } else {
-        handleRemove(e);
-      }
-    }
-  };
   return (
-    <div>
+    <div id="workday-page">
       <div className="mode-switch">
-        <Typography
-          sx={{
-            color: !isAddMode ? "black" : "gray",
-            fontWeight: !isAddMode ? "bold" : "normal",
-          }}
+        <Paper
+          elevation={1}
+          sx={{ display: "flex", alignItems: "center", gap: 2, padding: 2 }}
         >
-          Remove
-        </Typography>
+          <Typography
+            sx={{
+              color: !isAddMode ? "black" : "gray",
+              fontWeight: !isAddMode ? "bold" : "normal",
+            }}
+          >
+            Remove
+          </Typography>
 
-        <Switch checked={isAddMode} onChange={handleToggle} color="primary" />
+          <Switch checked={isAddMode} onChange={handleToggle} color="primary" />
 
-        <Typography
-          sx={{
-            color: isAddMode ? "black" : "gray",
-            fontWeight: isAddMode ? "bold" : "normal",
-          }}
-        >
-          Add
-        </Typography>
+          <Typography
+            sx={{
+              color: isAddMode ? "black" : "gray",
+              fontWeight: isAddMode ? "bold" : "normal",
+            }}
+          >
+            Add
+          </Typography>
+        </Paper>
       </div>
 
       <div className="calendar-container">
@@ -327,12 +321,14 @@ function ManageWorkdayPage() {
               </TextField>
             </Box>
           </>
-        ) : (
-          <></>
-        )}
+        ) : null}
       </div>
 
-      <Button variant="contained" onClick={handleConfirm} sx={{ marginY: 3 }}>
+      <Button
+        variant="contained"
+        onClick={handleConfirm}
+        sx={{ marginY: 3, height: 40 }}
+      >
         Confirm
       </Button>
     </div>

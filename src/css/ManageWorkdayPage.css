@@ -1,9 +1,12 @@
-.main {
+#workday-page {
   display: grid;
   grid-gap: 15px;
   grid-template-rows: 80px auto;
   justify-items: center;
   padding-top: 15px;
+  height: 100vh;
+  width: auto;
+  background-color: rgb(245, 245, 245);
 }
 
 .mode-switch {
@@ -25,8 +28,4 @@
 
 .end-time {
   padding: 5;
-}
-
-.classs1 {
-  background-color: black;
 }

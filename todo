@@ -1,9 +1,17 @@
+Problems:
+
+- When workday removed and then changed to add mode, the removed workdays appear again.
+  - prob a bug in deleting workdays
+
 TODO:
 
-- create SalaryPage
+- set month view and year view
+  - create function to calculate monthly salaru
 
 Done:
 
+- initialize SalaryPage
+- changing from 2024-12 to 2025-01, value becomes 2026-01
 - set onChangeMonth to connect with the yearMonth
 - set worktime range
 - allow day selection using number (shortcut) only when focus is on the whole page (not focused on time selection)

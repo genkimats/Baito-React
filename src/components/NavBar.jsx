@@ -11,10 +11,10 @@ function NavBar() {
       </div>
       <div className="navbar-links">
         <Link to="/" className="nav-link">
-          Home
+          Manage Workdays
         </Link>
-        <Link to="/favorites" className="nav-link">
-          Favorites
+        <Link to="/salary" className="nav-link">
+          Check Salary
         </Link>
       </div>
     </nav>
