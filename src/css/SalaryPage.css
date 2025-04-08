@@ -8,3 +8,8 @@
   grid-gap: 20px;
   background-color: rgb(245, 245, 245);
 }
+
+.monthly-salary {
+  font-size: 3rem;
+  font-weight: 400;
+}

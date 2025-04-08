@@ -106,7 +106,6 @@ export const BaitoManager = ({ children }) => {
       }
     };
     const monthWorkdays = fetchWorkdays(year, month);
-    console.log("Workdays: ", monthWorkdays);
     monthWorkdays.forEach((workday) => calculateSingleDay(workday));
     return dailySalary;
   };
@@ -116,10 +115,7 @@ export const BaitoManager = ({ children }) => {
     let monthlySalaries = [];
     allMonths.forEach((month) => {
       monthlySalaries.push(
-        calculateDailySalary(year, month).reduce(
-          (partialSum, a) => partialSum + a,
-          0
-        )
+        calculateDailySalary(year, month).reduce((tempSum, a) => tempSum + a, 0)
       );
     });
     return monthlySalaries;

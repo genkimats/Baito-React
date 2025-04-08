@@ -1,21 +1,20 @@
-import { BarChart } from "@mui/x-charts";
-
 import "../css/SalaryPage.css";
 // import { useBaitoContext } from "../context/BaitoContext";
 import { BaitoContext } from "../context/BaitoContext";
+import SalaryDisplay from "../components/SalaryDisplay";
 import DailySalariesChart from "../components/DailySalariesChart";
 import MonthlySalariesChart from "../components/MonthlySalariesChart";
 import { useEffect, useState, useContext } from "react";
 import {
   TextField,
   IconButton,
-  Box,
   Switch,
   Paper,
   Typography,
   InputAdornment,
 } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
+import Countup from "react-countup";
 
 function SalaryPage() {
   const { fetchWorkdays, calculateDailySalary, calculateMonthlySalary } =
@@ -52,13 +51,12 @@ function SalaryPage() {
     savedDate.getMonth()
   );
   const days = workdays.map((workday) => workday.day);
-
   const daysInMonth = savedDate.getDate();
-
   const dailySalariesArray = Array(daysInMonth).fill(0);
   days.map((day, index) => {
     dailySalariesArray[day - 1] = dailySalaries[index];
   });
+  const monthlySalary = dailySalaries.reduce((tempSum, a) => tempSum + a, 0);
 
   // Monthly salary vars
 
@@ -68,6 +66,7 @@ function SalaryPage() {
   months.map((month) => {
     monthlySalariesArray[month - 1] = monthlySalaries[month - 1];
   });
+  const yearlySalary = monthlySalaries.reduce((tempSum, a) => tempSum + a, 0);
 
   const [error, setError] = useState("");
 
@@ -206,9 +205,8 @@ function SalaryPage() {
             />
           </Paper>
 
-          <DailySalariesChart
-            salaries={dailySalariesArray}
-          ></DailySalariesChart>
+          <DailySalariesChart salaries={dailySalariesArray} />
+          <SalaryDisplay salary={monthlySalary}></SalaryDisplay>
         </>
       ) : (
         <>
@@ -254,6 +252,7 @@ function SalaryPage() {
             salaries={monthlySalariesArray}
             onItemClick={handleBarClick}
           ></MonthlySalariesChart>
+          <SalaryDisplay salary={yearlySalary}></SalaryDisplay>
         </>
       )}
     </div>

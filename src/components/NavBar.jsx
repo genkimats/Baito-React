@@ -16,6 +16,9 @@ function NavBar() {
         <Link to="/salary" className="nav-link">
           Check Salary
         </Link>
+        <Link to="/settings" className="nav-link">
+          Settings
+        </Link>
       </div>
     </nav>
   );

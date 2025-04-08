@@ -246,6 +246,7 @@ function ManageWorkdayPage() {
                 activeStartDate.getMonth()
               )
             );
+
             bodyRef.current.focus();
           }}
           view="month"
