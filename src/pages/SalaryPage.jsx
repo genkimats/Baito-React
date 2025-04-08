@@ -1,10 +1,11 @@
 import { BarChart } from "@mui/x-charts";
 
 import "../css/SalaryPage.css";
-import { useBaitoContext } from "../context/BaitoContext";
+// import { useBaitoContext } from "../context/BaitoContext";
+import { BaitoContext } from "../context/BaitoContext";
 import DailySalariesChart from "../components/DailySalariesChart";
 import MonthlySalariesChart from "../components/MonthlySalariesChart";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import {
   TextField,
   IconButton,
@@ -18,7 +19,7 @@ import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 
 function SalaryPage() {
   const { fetchWorkdays, calculateDailySalary, calculateMonthlySalary } =
-    useBaitoContext();
+    useContext(BaitoContext);
 
   const [savedDate, setSavedDate] = useState(new Date());
   const [workdays, setWorkdays] = useState(

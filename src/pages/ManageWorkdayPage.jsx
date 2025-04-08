@@ -1,6 +1,12 @@
 import Calendar from "react-calendar";
 import "../css/Calendar.css";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useContext,
+} from "react";
 import {
   Switch,
   Typography,
@@ -10,8 +16,9 @@ import {
   Box,
   Paper,
 } from "@mui/material";
+import { BaitoContext } from "../context/BaitoContext";
 import "../css/ManageWorkdayPage.css";
-import { useBaitoContext } from "../context/BaitoContext";
+// import { useBaitoContext } from "../context/BaitoContext";
 
 function ManageWorkdayPage() {
   const {
@@ -20,15 +27,18 @@ function ManageWorkdayPage() {
     WORKTIME_START,
     WORKTIME_END,
     PAY_INTERVAL_MINUTES,
-    workdays,
-    savedDate,
-    setSavedDate,
+    // workdays,
+    // savedDate,
+    // setSavedDate,
     addWorkday,
     updateWorkday,
     deleteWorkday,
-  } = useBaitoContext();
-  const initialDate = new Date();
-  const [selectedDay, setSelectedDay] = useState(initialDate.getDate());
+    fetchWorkdays,
+  } = useContext(BaitoContext);
+  const [savedDate, setSavedDate] = useState(new Date());
+  const [workdays, setWorkdays] = useState(fetchWorkdays());
+  // const initialDate = new Date();
+  // const [selectedDay, setSelectedDay] = useState(initialDate.getDate());
   const [isAddMode, setIsAddMode] = useState(true); // true -> Add , false -> Remove
 
   const [startTime, setStartTime] = useState({
@@ -45,16 +55,14 @@ function ManageWorkdayPage() {
   const endHourRef = useRef(null);
   const endMinuteRef = useRef(null);
 
-  // const body = document.getElementsByTagName("body")[0];
   const body = document.body;
   const bodyRef = useRef(body);
   bodyRef.current.setAttribute("tabindex", "-1");
 
-  let calendarDate = new Date(
-    savedDate.getFullYear(),
-    savedDate.getMonth(),
-    selectedDay
-  );
+  // const calendarDate = useMemo(
+  //   () => new Date(savedDate.getFullYear(), savedDate.getMonth(), selectedDay),
+  //   [savedDate, selectedDay]
+  // );
 
   const hourOptions = Array.from(
     { length: WORKTIME_END.hour - WORKTIME_START.hour + 1 },
@@ -75,18 +83,32 @@ function ManageWorkdayPage() {
 
   const handleKeyPress = useCallback(
     (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+      // e.preventDefault();
+      // e.stopPropagation();
       if (e.key >= "0" && e.key <= "9") {
         const newBuffer = `${keyBuffer}${e.key}`.slice(-2);
         setKeyBuffer(newBuffer);
         const day = parseInt(newBuffer);
-        if (day >= 1 && day <= 31) setSelectedDay(day);
+        if (day >= 1 && day <= 31) {
+          setSavedDate(
+            (prev) => new Date(prev.getFullYear(), prev.getMonth(), day)
+          );
+          console.log("Keyboard Shortcut: Changed day to", day);
+          console.log(workdays);
+        }
       } else if (e.key == " ") {
         if (isAddMode) setIsAddMode(false);
         else setIsAddMode(true);
       } else if (e.key === "Enter") {
         handleConfirm();
+      } else if (e.key === "ArrowRight") {
+        setSavedDate(
+          (prev) => new Date(prev.getFullYear(), prev.getMonth() + 1)
+        );
+      } else if (e.key === "ArrowLeft") {
+        setSavedDate(
+          (prev) => new Date(prev.getFullYear(), prev.getMonth() - 1)
+        );
       } else if (e.key === "Tab") {
         e.preventDefault();
         const focusedElement = document.activeElement;
@@ -109,11 +131,15 @@ function ManageWorkdayPage() {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [keyBuffer, isAddMode, resetBuffer]
+    [keyBuffer, isAddMode, resetBuffer, savedDate]
   );
 
   useEffect(() => {
-    setSavedDate(initialDate);
+    setWorkdays(fetchWorkdays(savedDate.getFullYear(), savedDate.getMonth()));
+  }, [savedDate, fetchWorkdays]);
+
+  useEffect(() => {
+    // setSavedDate(new Date());
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [handleKeyPress]);
@@ -126,7 +152,9 @@ function ManageWorkdayPage() {
   }, [handleKeyPress]);
 
   const handleDayClick = (date) => {
-    setSelectedDay(date.getDate());
+    setSavedDate(
+      (prev) => new Date(prev.getFullYear(), prev.getMonth(), date.getDate())
+    );
   };
 
   const handleTimeChange = (timeType, field) => (e) => {
@@ -146,28 +174,33 @@ function ManageWorkdayPage() {
 
   const handleConfirm = (e) => {
     e?.preventDefault?.();
-
-    const currentSelectedDay = selectedDay;
-    console.log(currentSelectedDay);
-
-    console.log(selectedDay);
+    const selectedDay = savedDate.getDate();
     if (isAddMode) {
       if (!workdays.some((workday) => workday.day === selectedDay)) {
-        addWorkday({
+        addWorkday(savedDate.getFullYear(), savedDate.getMonth(), {
           day: selectedDay,
           startTime: startTime,
           endTime: endTime,
         });
       } else {
-        updateWorkday(selectedDay, {
-          day: selectedDay,
-          startTime: startTime,
-          endTime: endTime,
-        });
+        updateWorkday(
+          savedDate.getFullYear(),
+          savedDate.getMonth(),
+          selectedDay,
+          {
+            day: selectedDay,
+            startTime: startTime,
+            endTime: endTime,
+          }
+        );
       }
     } else {
       if (workdays.some((workday) => workday.day === selectedDay)) {
-        deleteWorkday(selectedDay);
+        deleteWorkday(
+          savedDate.getFullYear(),
+          savedDate.getMonth(),
+          selectedDay
+        );
       }
     }
   };
@@ -204,7 +237,7 @@ function ManageWorkdayPage() {
       <div className="calendar-container">
         <Calendar
           className={"react-calendar"}
-          value={calendarDate}
+          value={savedDate}
           onClickDay={handleDayClick}
           onActiveStartDateChange={({ activeStartDate }) => {
             setSavedDate(

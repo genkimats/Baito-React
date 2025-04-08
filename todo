@@ -5,8 +5,9 @@ Problems:
 
 TODO:
 
+- localize the states (replace shared states) in ManageWorkdayPage
 - set month view and year view
-  - create function to calculate monthly salaru
+  - create function to calculate monthly salary
 
 Done:
 

@@ -1,8 +1,6 @@
-// /* eslint-disable react-hooks/exhaustive-deps */
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { useContext, createContext } from "react";
 
-const BaitoContext = createContext();
-
+export const BaitoContext = createContext();
 export const useBaitoContext = () => useContext(BaitoContext);
 
 export const BaitoManager = ({ children }) => {
@@ -21,20 +19,6 @@ export const BaitoManager = ({ children }) => {
   const WEEKEND_WAGE = 1500;
 
   // Managing workdays
-  const [savedDate, setSavedDate] = useState(new Date());
-  const yearMonth = `${savedDate.getFullYear()}-${String(
-    savedDate.getMonth() + 1
-  ).padStart(2, "0")}`;
-  const [workdays, setWorkdays] = useState([]);
-
-  useEffect(() => {
-    const workdaysStr = localStorage.getItem(yearMonth);
-    try {
-      if (workdaysStr) setWorkdays(JSON.parse(workdaysStr));
-    } catch (error) {
-      console.error("Failed to parse saved workdays:", error);
-    }
-  }, [savedDate, yearMonth]);
 
   const fetchWorkdays = (year, month) => {
     let workdays = [];
@@ -51,29 +35,39 @@ export const BaitoManager = ({ children }) => {
     return workdays;
   };
 
-  const addWorkday = (newWorkday) => {
-    if (!workdays.some((workday) => workday.day === newWorkday.day))
-      setWorkdays((prev) => {
-        const newWorkdays = [...prev, newWorkday];
-        localStorage.setItem(yearMonth, JSON.stringify(newWorkdays));
-        return newWorkdays;
-      });
+  const formatYearMonth = (year, month) => {
+    return `${year}-${String(month).padStart(2, "0")}`;
   };
 
-  const updateWorkday = (day, updatedWorkday) => {
-    setWorkdays((prev) => {
-      const newWorkdays = prev.map((w) => (w.day === day ? updatedWorkday : w));
-      localStorage.setItem(yearMonth, JSON.stringify(newWorkdays));
-      return newWorkdays;
-    });
+  const addWorkday = (year, month, newWorkday) => {
+    let workdays = fetchWorkdays(year, month);
+    if (!workdays.some((workday) => workday.day === newWorkday.day)) {
+      const newWorkdays = [...workdays, newWorkday];
+      localStorage.setItem(
+        formatYearMonth(year, month),
+        JSON.stringify(newWorkdays)
+      );
+    }
   };
 
-  const deleteWorkday = (day) => {
-    setWorkdays((prev) => {
-      const newWorkdays = prev.filter((w) => w.day !== day);
-      localStorage.setItem(yearMonth, JSON.stringify(newWorkdays));
-      return newWorkdays;
-    });
+  const updateWorkday = (year, month, day, updatedWorkday) => {
+    const weekdays = fetchWorkdays(year, month);
+    const newWorkdays = weekdays.map((w) =>
+      w.day === day ? updatedWorkday : w
+    );
+    localStorage.setItem(
+      formatYearMonth(year, month),
+      JSON.stringify(newWorkdays)
+    );
+  };
+
+  const deleteWorkday = (year, month, day) => {
+    const workdays = fetchWorkdays(year, month);
+    const newWorkdays = workdays.filter((w) => w.day !== day);
+    localStorage.setItem(
+      formatYearMonth(year, month),
+      JSON.stringify(newWorkdays)
+    );
   };
 
   // Checking Salary
@@ -111,17 +105,8 @@ export const BaitoManager = ({ children }) => {
         dailySalary.push(singleDaySalary);
       }
     };
-    const monthWorkdaysStr = localStorage.getItem(
-      `${year}-${String(month).padStart(2, "0")}`
-    );
-    let monthWorkdays = [];
-    try {
-      if (monthWorkdaysStr) {
-        monthWorkdays = JSON.parse(monthWorkdaysStr);
-      }
-    } catch (error) {
-      console.error("Failed to parse saved workdays:", error);
-    }
+    const monthWorkdays = fetchWorkdays(year, month);
+    console.log("Workdays: ", monthWorkdays);
     monthWorkdays.forEach((workday) => calculateSingleDay(workday));
     return dailySalary;
   };
@@ -146,10 +131,6 @@ export const BaitoManager = ({ children }) => {
     WORKTIME_START,
     WORKTIME_END,
     PAY_INTERVAL_MINUTES,
-    workdays,
-    setWorkdays,
-    savedDate,
-    setSavedDate,
     fetchWorkdays,
     addWorkday,
     updateWorkday,
