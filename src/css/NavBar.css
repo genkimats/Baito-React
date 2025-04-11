@@ -8,7 +8,7 @@
 }
 
 .navbar-brand {
-  font-size: 1.5rem;
+  font-size: 1.75rem !important;
   font-weight: bold;
 }
 
@@ -23,8 +23,8 @@
 }
 
 .nav-link {
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
+  font-size: 1.11rem !important;
+  padding: 0.25rem;
   border-radius: 4px;
   transition: background-color 0.2s;
   text-decoration: none;

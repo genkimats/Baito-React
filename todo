@@ -5,12 +5,22 @@ Problems:
 
 TODO:
 
-- localize the states (replace shared states) in ManageWorkdayPage
-- set month view and year view
-  - create function to calculate monthly salary
+- support change in wage (add wage prop in workday)
+  - add field for wage in add workday
+  - default value is the WEEKDAY_WAGE and WEEKEND_WAGE
+- create modal for confirmation of add/remove/save
 
 Done:
 
+- Settings page
+  - adjust generated ui (partially done)
+  - implement mechanism to store settings to localStorage
+  - limit "pay interval" to values(x) which 60 % x == 0
+    - either provide fixed values, or calculate the modulo every time
+  - limit the minute choices by incrementing by the "pay interval" value
+- localize the states (replace shared states) in ManageWorkdayPage
+  - create function to calculate monthly salary
+- set month view and year view
 - initialize SalaryPage
 - changing from 2024-12 to 2025-01, value becomes 2026-01
 - set onChangeMonth to connect with the yearMonth

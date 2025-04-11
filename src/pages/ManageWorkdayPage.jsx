@@ -15,6 +15,7 @@ import {
   MenuItem,
   Box,
   Paper,
+  InputAdornment,
 } from "@mui/material";
 import { BaitoContext } from "../context/BaitoContext";
 import "../css/ManageWorkdayPage.css";
@@ -27,9 +28,8 @@ function ManageWorkdayPage() {
     WORKTIME_START,
     WORKTIME_END,
     PAY_INTERVAL_MINUTES,
-    // workdays,
-    // savedDate,
-    // setSavedDate,
+    WEEKDAY_WAGE,
+    WEEKEND_WAGE,
     addWorkday,
     updateWorkday,
     deleteWorkday,
@@ -37,8 +37,13 @@ function ManageWorkdayPage() {
   } = useContext(BaitoContext);
   const [savedDate, setSavedDate] = useState(new Date());
   const [workdays, setWorkdays] = useState(fetchWorkdays());
-  // const initialDate = new Date();
-  // const [selectedDay, setSelectedDay] = useState(initialDate.getDate());
+
+  const [currentWage, setCurrentWage] = useState(
+    savedDate.getDay() == 0 || savedDate.getDay() == 6
+      ? WEEKEND_WAGE
+      : WEEKDAY_WAGE
+  );
+
   const [isAddMode, setIsAddMode] = useState(true); // true -> Add , false -> Remove
 
   const [startTime, setStartTime] = useState({
@@ -59,11 +64,6 @@ function ManageWorkdayPage() {
   const bodyRef = useRef(body);
   bodyRef.current.setAttribute("tabindex", "-1");
 
-  // const calendarDate = useMemo(
-  //   () => new Date(savedDate.getFullYear(), savedDate.getMonth(), selectedDay),
-  //   [savedDate, selectedDay]
-  // );
-
   const hourOptions = Array.from(
     { length: WORKTIME_END.hour - WORKTIME_START.hour + 1 },
     (_, i) => WORKTIME_START.hour + i
@@ -83,8 +83,6 @@ function ManageWorkdayPage() {
 
   const handleKeyPress = useCallback(
     (e) => {
-      // e.preventDefault();
-      // e.stopPropagation();
       if (e.key >= "0" && e.key <= "9") {
         const newBuffer = `${keyBuffer}${e.key}`.slice(-2);
         setKeyBuffer(newBuffer);
@@ -135,11 +133,15 @@ function ManageWorkdayPage() {
   );
 
   useEffect(() => {
+    setCurrentWage(
+      savedDate.getDay() == 0 || savedDate.getDay() == 6
+        ? WEEKEND_WAGE
+        : WEEKDAY_WAGE
+    );
     setWorkdays(fetchWorkdays(savedDate.getFullYear(), savedDate.getMonth()));
-  }, [savedDate, fetchWorkdays]);
+  }, [savedDate, fetchWorkdays, WEEKDAY_WAGE, WEEKEND_WAGE]);
 
   useEffect(() => {
-    // setSavedDate(new Date());
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [handleKeyPress]);
@@ -172,6 +174,10 @@ function ManageWorkdayPage() {
     setIsAddMode(event.target.checked);
   };
 
+  const handleWageChange = (event) => {
+    setCurrentWage(event.target.value);
+  };
+
   const handleConfirm = (e) => {
     e?.preventDefault?.();
     const selectedDay = savedDate.getDate();
@@ -181,6 +187,7 @@ function ManageWorkdayPage() {
           day: selectedDay,
           startTime: startTime,
           endTime: endTime,
+          wage: currentWage,
         });
       } else {
         updateWorkday(
@@ -191,6 +198,7 @@ function ManageWorkdayPage() {
             day: selectedDay,
             startTime: startTime,
             endTime: endTime,
+            wage: currentWage,
           }
         );
       }
@@ -206,16 +214,18 @@ function ManageWorkdayPage() {
   };
 
   return (
-    <div id="workday-page">
+    <div className="page" id="workday-page">
       <div className="mode-switch">
         <Paper
           elevation={1}
-          sx={{ display: "flex", alignItems: "center", gap: 2, padding: 2 }}
+          sx={{ display: "flex", alignItems: "center", gap: 0, padding: 1.5 }}
         >
           <Typography
             sx={{
               color: !isAddMode ? "black" : "gray",
               fontWeight: !isAddMode ? "bold" : "normal",
+              width: 50,
+              textAlign: "center",
             }}
           >
             Remove
@@ -227,6 +237,8 @@ function ManageWorkdayPage() {
             sx={{
               color: isAddMode ? "black" : "gray",
               fontWeight: isAddMode ? "bold" : "normal",
+              width: 50,
+              textAlign: "center",
             }}
           >
             Add
@@ -259,100 +271,130 @@ function ManageWorkdayPage() {
         ></Calendar>
       </div>
 
-      <div className="select-time">
+      <div className="option-container">
         {isAddMode ? (
           <>
-            <Box
-              sx={{
-                display: "flex",
-                gap: 1,
-                marginY: 3,
-                width: 225,
-                alignItems: "center",
-              }}
-            >
-              <Typography sx={{ color: "black", whiteSpace: "nowrap" }}>
-                Start Time
-              </Typography>
-              <TextField
-                select
-                value={startTime.hour}
-                onChange={handleTimeChange("start", "hour")}
-                label="Hours"
-                size="small"
-                fullWidth
-                inputRef={startHourRef}
-                id="StartHour"
+            <div className="select-time">
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  marginY: 3,
+                  width: 225,
+                  alignItems: "center",
+                }}
               >
-                {hourOptions.map((hour) => (
-                  <MenuItem key={`start-h-${hour}`} value={hour}>
-                    {String(hour).padStart(2, "0")}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                select
-                value={startTime.minute}
-                onChange={handleTimeChange("start", "minute")}
-                label="Minutes"
-                size="small"
-                type="number"
-                fullWidth
-                inputRef={startMinuteRef}
-                id="StartMinute"
+                <Typography sx={{ color: "black", whiteSpace: "nowrap" }}>
+                  Start Time
+                </Typography>
+                <TextField
+                  select
+                  value={startTime.hour}
+                  onChange={handleTimeChange("start", "hour")}
+                  label="Hours"
+                  size="small"
+                  fullWidth
+                  inputRef={startHourRef}
+                  id="StartHour"
+                >
+                  {hourOptions.map((hour) => (
+                    <MenuItem key={`start-h-${hour}`} value={hour}>
+                      {String(hour).padStart(2, "0")}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  select
+                  value={startTime.minute}
+                  onChange={handleTimeChange("start", "minute")}
+                  label="Minutes"
+                  size="small"
+                  type="number"
+                  fullWidth
+                  inputRef={startMinuteRef}
+                  id="StartMinute"
+                >
+                  {minuteOptions.map((minute) => (
+                    <MenuItem key={`start-h-${minute}`} value={minute}>
+                      {String(minute).padStart(2, "0")}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  marginTop: 3,
+                  width: 225,
+                  alignItems: "center",
+                }}
               >
-                {minuteOptions.map((minute) => (
-                  <MenuItem key={`start-h-${minute}`} value={minute}>
-                    {String(minute).padStart(2, "0")}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Box>
+                <Typography sx={{ color: "black", whiteSpace: "nowrap" }}>
+                  End Time
+                </Typography>
+                <TextField
+                  select
+                  value={endTime.hour}
+                  onChange={handleTimeChange("end", "hour")}
+                  label="Hours"
+                  size="small"
+                  fullWidth
+                  sx={{ marginLeft: 0.75 }}
+                  inputRef={endHourRef}
+                  id="EndHour"
+                >
+                  {hourOptions.map((hour) => (
+                    <MenuItem key={`end-h-${hour}`} value={hour}>
+                      {String(hour).padStart(2, "0")}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  select
+                  value={endTime.minute}
+                  onChange={handleTimeChange("end", "minute")}
+                  label="Minutes"
+                  size="small"
+                  fullWidth
+                  inputRef={endMinuteRef}
+                  id="EndMinute"
+                >
+                  {minuteOptions.map((minute) => (
+                    <MenuItem key={`end-h-${minute}`} value={minute}>
+                      {String(minute).padStart(2, "0")}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Box>
+            </div>
             <Box
               sx={{
                 display: "flex",
                 gap: 1,
                 marginTop: 3,
-                width: 225,
+                width: 125,
                 alignItems: "center",
               }}
             >
               <Typography sx={{ color: "black", whiteSpace: "nowrap" }}>
-                End Time
+                Wage
               </Typography>
               <TextField
-                select
-                value={endTime.hour}
-                onChange={handleTimeChange("end", "hour")}
-                label="Hours"
+                value={currentWage}
+                onChange={handleWageChange}
                 size="small"
+                type="number"
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">¥</InputAdornment>
+                    ),
+                  },
+                }}
                 fullWidth
-                sx={{ marginLeft: 0.75 }}
-                inputRef={endHourRef}
                 id="EndHour"
-              >
-                {hourOptions.map((hour) => (
-                  <MenuItem key={`end-h-${hour}`} value={hour}>
-                    {String(hour).padStart(2, "0")}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                select
-                value={endTime.minute}
-                onChange={handleTimeChange("end", "minute")}
-                label="Minutes"
-                size="small"
-                fullWidth
-                inputRef={endMinuteRef}
-                id="EndMinute"
-              >
-                {minuteOptions.map((minute) => (
-                  <MenuItem key={`end-h-${minute}`} value={minute}>
-                    {String(minute).padStart(2, "0")}
-                  </MenuItem>
-                ))}
-              </TextField>
+              ></TextField>
             </Box>
           </>
         ) : null}

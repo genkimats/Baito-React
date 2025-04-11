@@ -1,22 +1,71 @@
-import React, { useContext, createContext } from "react";
+import React, { useContext, createContext, useState, useEffect } from "react";
 
 export const BaitoContext = createContext();
 export const useBaitoContext = () => useContext(BaitoContext);
 
 export const BaitoManager = ({ children }) => {
   // Configs
-  const DEFAULT_START_TIME = { hour: 17, minute: 0 };
-  const DEFAULT_END_TIME = { hour: 22, minute: 0 };
 
-  const WORKTIME_START = { hour: 17, minute: 0 };
-  const WORKTIME_END = { hour: 24, minute: 0 };
+  const [DEFAULT_START_TIME, setDefaultStartTime] = useState({
+    hour: 17,
+    minute: 0,
+  });
+  const [DEFAULT_END_TIME, setDefaultEndTime] = useState({
+    hour: 22,
+    minute: 0,
+  });
 
-  const PAY_INTERVAL_MINUTES = 15;
+  const [WORKTIME_START, setWorktimeStart] = useState({ hour: 17, minute: 0 });
+  const [WORKTIME_END, setWorktimeEnd] = useState({ hour: 24, minute: 0 });
 
-  const TIME_BARRIER = { hour: 22, minute: 0 };
+  const [PAY_INTERVAL_MINUTES, setPayIntervalMinutes] = useState(15);
 
-  const WEEKDAY_WAGE = 1200;
-  const WEEKEND_WAGE = 1500;
+  const [TIME_BARRIER, setTimeBarrier] = useState({ hour: 22, minute: 0 });
+
+  const [COMMUTING_COST, setCommutingCost] = useState(230);
+
+  const [WEEKDAY_WAGE, setWeekdayWage] = useState(1200);
+  const [WEEKEND_WAGE, setWeekendWage] = useState(1500);
+
+  useEffect(() => {
+    const setDefaultIfNotExists = (key, defaultValue) => {
+      if (localStorage.getItem(key) === null) {
+        localStorage.setItem(key, defaultValue);
+      }
+    };
+
+    setDefaultIfNotExists("DefaultStartHour", 17);
+    setDefaultIfNotExists("DefaultStartMinute", 0);
+    setDefaultIfNotExists("DefaultEndHour", 22);
+    setDefaultIfNotExists("DefaultEndMinute", 0);
+    setDefaultIfNotExists("EarliestStartHour", 17);
+    setDefaultIfNotExists("EarliestStartMinute", 0);
+    setDefaultIfNotExists("LatestEndHour", 24);
+    setDefaultIfNotExists("LatestEndMinute", 0);
+    setDefaultIfNotExists("WeekdayWage", 1200);
+    setDefaultIfNotExists("WeekendWage", 1500);
+    setDefaultIfNotExists("CommutingCost", 230);
+
+    setDefaultStartTime({
+      hour: parseInt(localStorage.getItem("DefaultStartHour")) || 17,
+      minute: parseInt(localStorage.getItem("DefaultStartMinute")) || 0,
+    });
+    setDefaultEndTime({
+      hour: parseInt(localStorage.getItem("DefaultEndHour")) || 22,
+      minute: parseInt(localStorage.getItem("DefaultEndMinute")) || 0,
+    });
+    setWorktimeStart({
+      hour: parseInt(localStorage.getItem("EarliestStartHour")) || 17,
+      minute: parseInt(localStorage.getItem("EarliestStartMinute")) || 0,
+    });
+    setWorktimeEnd({
+      hour: parseInt(localStorage.getItem("LatestEndHour")) || 24,
+      minute: parseInt(localStorage.getItem("LatestEndMinute")) || 0,
+    });
+    setWeekdayWage(parseInt(localStorage.getItem("WeekdayWage")) || 1200);
+    setWeekendWage(parseInt(localStorage.getItem("WeekendWage")) || 1500);
+    setCommutingCost(parseInt(localStorage.getItem("CommutingCost")) || 230);
+  }, []);
 
   // Managing workdays
 
@@ -77,11 +126,7 @@ export const BaitoManager = ({ children }) => {
 
     const calculateSingleDay = (workday) => {
       let singleDaySalary = 0;
-      const currentDate = new Date(year, month, workday.day);
-      const wage =
-        currentDate.getDay() === 0 || currentDate.getDay() === 6
-          ? WEEKEND_WAGE
-          : WEEKDAY_WAGE;
+      const wage = workday.wage;
       if (
         workday.endTime.hour >= TIME_BARRIER.hour &&
         workday.endTime.minute > TIME_BARRIER.minute
@@ -94,16 +139,14 @@ export const BaitoManager = ({ children }) => {
           (workday.endTime.hour - TIME_BARRIER.hour) * wage * 1.25;
         singleDaySalary +=
           ((workday.endTime.minute - TIME_BARRIER.minute) / 60) * wage * 1.25;
-
-        dailySalary.push(singleDaySalary);
       } else {
         singleDaySalary +=
           (workday.endTime.hour - workday.startTime.hour) * wage;
         singleDaySalary +=
           ((workday.endTime.minute - workday.startTime.minute) / 60) * wage;
-
-        dailySalary.push(singleDaySalary);
       }
+      singleDaySalary += 2 * COMMUTING_COST;
+      dailySalary.push(singleDaySalary);
     };
     const monthWorkdays = fetchWorkdays(year, month);
     monthWorkdays.forEach((workday) => calculateSingleDay(workday));
@@ -126,7 +169,20 @@ export const BaitoManager = ({ children }) => {
     DEFAULT_END_TIME,
     WORKTIME_START,
     WORKTIME_END,
+    COMMUTING_COST,
     PAY_INTERVAL_MINUTES,
+    WEEKDAY_WAGE,
+    WEEKEND_WAGE,
+    TIME_BARRIER,
+    setDefaultStartTime,
+    setDefaultEndTime,
+    setWorktimeStart,
+    setWorktimeEnd,
+    setCommutingCost,
+    setPayIntervalMinutes,
+    setTimeBarrier,
+    setWeekdayWage,
+    setWeekendWage,
     fetchWorkdays,
     addWorkday,
     updateWorkday,

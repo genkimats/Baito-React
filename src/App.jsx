@@ -4,6 +4,7 @@ import SettingsPage from "./pages/SettingsPage";
 import NavBar from "./components/NavBar";
 import { Route, Routes } from "react-router-dom";
 import { BaitoManager } from "./context/BaitoContext";
+import "./css/App.css";
 
 function App() {
   return (

@@ -4,9 +4,6 @@
   grid-template-rows: 80px min-content min-content min-content;
   justify-items: center;
   padding-top: 15px;
-  height: 100vh;
-  width: auto;
-  background-color: rgb(245, 245, 245);
 }
 
 .mode-switch {
@@ -20,12 +17,7 @@
   height: 250px;
 }
 
-.start-time {
+.option-container {
   display: flex;
-  gap: 10;
-  padding: 10;
-}
-
-.end-time {
-  padding: 5;
+  gap: 40px;
 }
