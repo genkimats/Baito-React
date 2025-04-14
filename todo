@@ -1,7 +1,7 @@
 Problems:
 
-- When workday removed and then changed to add mode, the removed workdays appear again.
-  - prob a bug in deleting workdays
+- change month using arrow keys does not change the month display
+- when adding workday, the wage automatically changes to the wage of current day
 
 TODO:
 

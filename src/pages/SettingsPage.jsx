@@ -358,13 +358,6 @@ function SettingsPage() {
                   value={tempPayIntervalMinutes}
                   select
                   onChange={(e) => handleChange(e, "PayIntervalMinutes")}
-                  // slotProps={{
-                  //   input: {
-                  //     endAdornment: (
-                  //       <InputAdornment position="end">mins</InputAdornment>
-                  //     ),
-                  //   },
-                  // }}
                 >
                   {[1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60].map((value) => (
                     <MenuItem key={value} value={value}>

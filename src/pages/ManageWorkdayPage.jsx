@@ -35,6 +35,7 @@ function ManageWorkdayPage() {
     deleteWorkday,
     fetchWorkdays,
   } = useContext(BaitoContext);
+
   const [savedDate, setSavedDate] = useState(new Date());
   const [workdays, setWorkdays] = useState(fetchWorkdays());
 
@@ -63,6 +64,9 @@ function ManageWorkdayPage() {
   const body = document.body;
   const bodyRef = useRef(body);
   bodyRef.current.setAttribute("tabindex", "-1");
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [actionToConfirm, setActionToConfirm] = useState(null);
 
   const hourOptions = Array.from(
     { length: WORKTIME_END.hour - WORKTIME_START.hour + 1 },
@@ -100,13 +104,17 @@ function ManageWorkdayPage() {
       } else if (e.key === "Enter") {
         handleConfirm();
       } else if (e.key === "ArrowRight") {
-        setSavedDate(
-          (prev) => new Date(prev.getFullYear(), prev.getMonth() + 1)
-        );
+        setSavedDate((prev) => {
+          const newDate = new Date(prev);
+          newDate.setMonth(newDate.getMonth() + 1);
+          return newDate;
+        });
       } else if (e.key === "ArrowLeft") {
-        setSavedDate(
-          (prev) => new Date(prev.getFullYear(), prev.getMonth() - 1)
-        );
+        setSavedDate((prev) => {
+          const newDate = new Date(prev);
+          newDate.setMonth(newDate.getMonth() - 1);
+          return newDate;
+        });
       } else if (e.key === "Tab") {
         e.preventDefault();
         const focusedElement = document.activeElement;
@@ -129,7 +137,7 @@ function ManageWorkdayPage() {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [keyBuffer, isAddMode, resetBuffer, savedDate]
+    [keyBuffer, isAddMode, resetBuffer, savedDate, currentWage]
   );
 
   useEffect(() => {
@@ -251,6 +259,7 @@ function ManageWorkdayPage() {
           className={"react-calendar"}
           value={savedDate}
           onClickDay={handleDayClick}
+          // onChange={setSavedDate}
           onActiveStartDateChange={({ activeStartDate }) => {
             setSavedDate(
               new Date(
