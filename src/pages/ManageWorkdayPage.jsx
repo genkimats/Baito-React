@@ -18,6 +18,7 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { BaitoContext } from "../context/BaitoContext";
+import ConfirmationModal from "../components/ConfirmationModal.jsx";
 import "../css/ManageWorkdayPage.css";
 // import { useBaitoContext } from "../context/BaitoContext";
 
@@ -66,7 +67,6 @@ function ManageWorkdayPage() {
   bodyRef.current.setAttribute("tabindex", "-1");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [actionToConfirm, setActionToConfirm] = useState(null);
 
   const hourOptions = Array.from(
     { length: WORKTIME_END.hour - WORKTIME_START.hour + 1 },
@@ -102,7 +102,8 @@ function ManageWorkdayPage() {
         if (isAddMode) setIsAddMode(false);
         else setIsAddMode(true);
       } else if (e.key === "Enter") {
-        handleConfirm();
+        if (isModalOpen) handleConfirm();
+        else handleShowConfirmation();
       } else if (e.key === "ArrowRight") {
         setSavedDate((prev) => {
           const newDate = new Date(prev);
@@ -186,6 +187,14 @@ function ManageWorkdayPage() {
     setCurrentWage(event.target.value);
   };
 
+  const handleShowConfirmation = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
   const handleConfirm = (e) => {
     e?.preventDefault?.();
     const selectedDay = savedDate.getDate();
@@ -219,6 +228,7 @@ function ManageWorkdayPage() {
         );
       }
     }
+    setIsModalOpen(false);
   };
 
   return (
@@ -411,11 +421,20 @@ function ManageWorkdayPage() {
 
       <Button
         variant="contained"
-        onClick={handleConfirm}
+        onClick={handleShowConfirmation}
         sx={{ marginY: 3, height: 40 }}
       >
         Confirm
       </Button>
+
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={handleCancel}
+        onConfirm={handleConfirm}
+        title={`Confirm ${isAddMode ? "Addition" : "Deletion"}`}
+        confirmText="Confirm"
+        cancelText="Cancel"
+      />
     </div>
   );
 }
