@@ -434,6 +434,18 @@ function ManageWorkdayPage() {
         title={`Confirm ${isAddMode ? "Addition" : "Deletion"}`}
         confirmText="Confirm"
         cancelText="Cancel"
+        message={
+          isAddMode
+            ? `${savedDate.getMonth()}/${savedDate.getDate()} ${String(
+                startTime.hour
+              ).padStart(2, "0")}:${String(startTime.minute).padStart(
+                2,
+                "0"
+              )} - ${String(endTime.hour).padStart(2, "0")}:${String(
+                endTime.minute
+              ).padStart(2, "0")}`
+            : `${savedDate.getMonth()}/${savedDate.getDate()}`
+        }
       />
     </div>
   );
