@@ -358,6 +358,13 @@ function SettingsPage() {
                   value={tempPayIntervalMinutes}
                   select
                   onChange={(e) => handleChange(e, "PayIntervalMinutes")}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="start">min</InputAdornment>
+                      ),
+                    },
+                  }}
                 >
                   {[1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60].map((value) => (
                     <MenuItem key={value} value={value}>
@@ -378,7 +385,7 @@ function SettingsPage() {
               marginTop: 2,
             }}
           >
-            <Button variant="outlined">Cancel</Button>
+            {/* <Button variant="outlined">Cancel</Button> */}
             <Button variant="contained" color="primary" onClick={handleSave}>
               Save Settings
             </Button>
