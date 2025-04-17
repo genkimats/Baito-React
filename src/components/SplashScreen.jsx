@@ -27,7 +27,7 @@ const SplashScreen = () => {
   return (
     <div className="splash-screen" style={{ opacity: isLoading ? 1 : 0 }}>
       <img
-        src="src/assets/LighterBlue.gif"
+        src="src/assets/NormalMB.gif"
         alt="App Logo"
         className="splash-gif"
       />

@@ -13,14 +13,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #ffffff; /* Match your app's background */
+  background-color: #ffffff;
   z-index: 9999;
   transition: opacity 0.5s ease-out;
-  pointer-events: none; /* Allows clicks to pass through during fade */
+  pointer-events: none;
 }
 
 .splash-gif {
-  width: 200px; /* Adjust based on your GIF size */
-  height: 200px;
+  width: 300px;
+  height: 300px;
   object-fit: contain;
 }

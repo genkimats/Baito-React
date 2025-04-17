@@ -6,7 +6,8 @@ function NavBar() {
     <nav className="navbar">
       <div className="navbar-brand">
         <Link to="/" className="navbar-brand-link">
-          Baito
+          <span style={{ color: "rgb(100, 181, 246)" }}>My</span>
+          <span style={{ color: "rgb(2, 136, 209)" }}>Baito</span>
         </Link>
       </div>
       <div className="navbar-links">

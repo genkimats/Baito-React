@@ -14,7 +14,6 @@
 
 .navbar-brand-link {
   text-decoration: none;
-  color: rgb(113, 79, 247);
 }
 
 .navbar-links {
@@ -28,6 +27,7 @@
   border-radius: 4px;
   transition: background-color 0.2s;
   text-decoration: none;
+  color: rgb(196, 228, 255);
 }
 
 .nav-link:hover {
