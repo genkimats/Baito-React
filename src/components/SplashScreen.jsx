@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import splashGif from "../assets/NormalMB.gif";
 
 const SplashScreen = () => {
   const [isVisible, setIsVisible] = useState(true);
@@ -26,11 +27,7 @@ const SplashScreen = () => {
 
   return (
     <div className="splash-screen" style={{ opacity: isLoading ? 1 : 0 }}>
-      <img
-        src="src/assets/NormalMB.gif"
-        alt="App Logo"
-        className="splash-gif"
-      />
+      <img src={splashGif} alt="App Logo" className="splash-gif" />
     </div>
   );
 };
