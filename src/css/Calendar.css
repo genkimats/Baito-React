@@ -55,3 +55,9 @@
     font-size: 1.2rem;
   }
 }
+
+@media (max-width: 768px) {
+  .react-calendar {
+    width: 80%;
+  }
+}
