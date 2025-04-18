@@ -56,8 +56,9 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 500px) {
   .react-calendar {
     width: 80%;
+    justify-self: center;
   }
 }

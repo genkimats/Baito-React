@@ -15,10 +15,15 @@
 .calendar-container {
   width: auto;
   height: 250px;
-  justify-items: center;
 }
 
 .option-container {
   display: flex;
   gap: 40px;
+}
+
+@media (max-width: 500px) {
+  .option-container {
+    gap: 1.5rem;
+  }
 }
