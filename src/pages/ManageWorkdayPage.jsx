@@ -20,7 +20,6 @@ import {
 import { BaitoContext } from "../context/BaitoContext";
 import ConfirmationModal from "../components/ConfirmationModal.jsx";
 import "../css/ManageWorkdayPage.css";
-// import { useBaitoContext } from "../context/BaitoContext";
 
 function ManageWorkdayPage() {
   const {
@@ -269,7 +268,6 @@ function ManageWorkdayPage() {
           className={"react-calendar"}
           value={savedDate}
           onClickDay={handleDayClick}
-          // onChange={setSavedDate}
           onActiveStartDateChange={({ activeStartDate }) => {
             setSavedDate(
               new Date(
