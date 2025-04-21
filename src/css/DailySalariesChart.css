@@ -1,0 +1,12 @@
+.chart-container {
+  width: 800px;
+  height: 400px;
+}
+
+@media (max-width: 800px) {
+  .chart-container {
+    padding-left: 40px;
+    width: 110%;
+    height: 300px;
+  }
+}

@@ -1,5 +1,6 @@
 import React from "react";
 import { BarChart } from "@mui/x-charts";
+import "../css/MonthlySalariesChart.css";
 
 const MonthlySalariesChart = ({ salaries, onItemClick }) => {
   const months = [
@@ -23,32 +24,32 @@ const MonthlySalariesChart = ({ salaries, onItemClick }) => {
   }));
 
   return (
-    <BarChart
-      dataset={chartData}
-      xAxis={[
-        {
-          scaleType: "band",
-          dataKey: "month",
-          label: "Month of Year",
-        },
-      ]}
-      yAxis={[
-        {
-          // label: "Salary (¥)",
-          min: 0,
-        },
-      ]}
-      series={[
-        {
-          dataKey: "salary",
-          label: "Monthly Salary",
-          color: "#4caf50",
-        },
-      ]}
-      onItemClick={onItemClick}
-      width={1000}
-      height={400}
-    />
+    <div className="chart-container">
+      <BarChart
+        dataset={chartData}
+        xAxis={[
+          {
+            scaleType: "band",
+            dataKey: "month",
+            label: "Month of Year",
+          },
+        ]}
+        yAxis={[
+          {
+            // label: "Salary (¥)",
+            min: 0,
+          },
+        ]}
+        series={[
+          {
+            dataKey: "salary",
+            label: "Monthly Salary",
+            color: "#4caf50",
+          },
+        ]}
+        onItemClick={onItemClick}
+      />
+    </div>
   );
 };
 

@@ -1,5 +1,6 @@
 import React from "react";
 import { BarChart } from "@mui/x-charts";
+import "../css/DailySalariesChart.css";
 
 const DailySalariesChart = ({ salaries }) => {
   // Create array for all days in month (1-31)
@@ -12,31 +13,31 @@ const DailySalariesChart = ({ salaries }) => {
   }));
 
   return (
-    <BarChart
-      dataset={chartData}
-      xAxis={[
-        {
-          scaleType: "band",
-          dataKey: "day",
-          label: "Day of Month",
-        },
-      ]}
-      yAxis={[
-        {
-          // label: "Salary (¥)",
-          min: 0,
-        },
-      ]}
-      series={[
-        {
-          dataKey: "salary",
-          label: "Daily Salary",
-          color: "#4caf50",
-        },
-      ]}
-      width={1000}
-      height={400}
-    />
+    <div className="chart-container">
+      <BarChart
+        dataset={chartData}
+        xAxis={[
+          {
+            scaleType: "band",
+            dataKey: "day",
+            label: "Day of Month",
+          },
+        ]}
+        yAxis={[
+          {
+            // label: "Salary (¥)",
+            min: 0,
+          },
+        ]}
+        series={[
+          {
+            dataKey: "salary",
+            label: "Daily Salary",
+            color: "#4caf50",
+          },
+        ]}
+      />
+    </div>
   );
 };
 

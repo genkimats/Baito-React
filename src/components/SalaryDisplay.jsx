@@ -6,6 +6,7 @@ function SalaryDisplay(props) {
     <>
       <Paper
         elevation={2}
+        className="display-container"
         sx={{
           display: "grid",
           paddingX: 0,
