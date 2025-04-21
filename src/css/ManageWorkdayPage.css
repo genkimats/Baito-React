@@ -15,6 +15,7 @@
 .calendar-container {
   width: auto;
   height: 250px;
+  justify-self: center;
 }
 
 .option-container {

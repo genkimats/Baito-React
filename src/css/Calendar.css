@@ -1,5 +1,6 @@
 .react-calendar {
   width: 500px;
+  justify-self: center;
 
   .react-calendar__navigation {
     display: flex;
@@ -58,8 +59,6 @@
 
 @media (max-width: 500px) {
   .react-calendar {
-    width: 90%;
-    /* justify-self: center; */
-    padding-left: 10%;
+    width: 80%;
   }
 }
