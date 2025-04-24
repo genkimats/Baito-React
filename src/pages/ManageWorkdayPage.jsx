@@ -285,7 +285,7 @@ function ManageWorkdayPage() {
               ? "workday"
               : ""
           }
-        ></Calendar>
+        />
       </div>
 
       <div className="option-container">
