@@ -61,5 +61,6 @@
   .react-calendar {
     width: 80%;
     justify-self: center;
+    margin-left: 10%;
   }
 }
