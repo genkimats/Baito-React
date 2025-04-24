@@ -57,8 +57,9 @@
   }
 }
 
-/* @media (max-width: 500px) {
+@media (max-width: 500px) {
   .react-calendar {
-    width: 80%;
+    width: 90%;
+    margin-left: 10%;
   }
-} */
+}
