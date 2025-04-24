@@ -59,7 +59,6 @@
 
 @media (max-width: 500px) {
   .react-calendar {
-    width: 90%;
-    margin-left: 10%;
+    width: 80%;
   }
 }
