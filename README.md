@@ -1,1 +1,1 @@
-A simple baito (part-time work) manager for **recording workdays** and **checking salaries**.
+To use the web app, simply access through the link.
