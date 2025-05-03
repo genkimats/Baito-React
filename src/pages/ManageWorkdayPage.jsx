@@ -77,17 +77,22 @@ function ManageWorkdayPage() {
   );
 
   const [keyBuffer, setKeyBuffer] = useState("");
-  const timeoutRef = useRef(null);
-
-  const resetBuffer = useCallback(() => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => setKeyBuffer(""), 500);
-  }, []);
+  const lastKeyTimeRef = useRef(0);
 
   const handleKeyPress = useCallback(
     (e) => {
       if (e.key >= "0" && e.key <= "9") {
-        const newBuffer = `${keyBuffer}${e.key}`.slice(-2);
+        const now = Date.now();
+        const timeSinceLast = now - lastKeyTimeRef.current;
+        lastKeyTimeRef.current = now;
+        let newBuffer = "";
+
+        if (timeSinceLast > 1000) {
+          newBuffer = e.key;
+        } else {
+          newBuffer = `${keyBuffer}${e.key}`.slice(-2);
+        }
+
         setKeyBuffer(newBuffer);
         const day = parseInt(newBuffer);
         if (day >= 1 && day <= 31) {
@@ -137,7 +142,7 @@ function ManageWorkdayPage() {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [keyBuffer, isAddMode, resetBuffer, savedDate, currentWage]
+    [keyBuffer, isAddMode, savedDate, currentWage]
   );
 
   useEffect(() => {
@@ -151,12 +156,7 @@ function ManageWorkdayPage() {
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [handleKeyPress]);
-
-  useEffect(() => {
     return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
       window.removeEventListener("keydown", handleKeyPress);
     };
   }, [handleKeyPress]);
