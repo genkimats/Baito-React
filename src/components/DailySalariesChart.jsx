@@ -4,7 +4,6 @@ import '../css/DailySalariesChart.css';
 
 const DailySalariesChart = ({ salaries }) => {
   // Create array for all days in month (1-31)
-  console.log('salaries in DailySalariesChart:', salaries);
   const allDays = Array.from({ length: salaries.length }, (_, i) => i + 1);
 
   // Merge with salaries data (fill missing days with 0)

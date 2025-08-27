@@ -1,29 +1,19 @@
-import "../css/SalaryPage.css";
+import '../css/SalaryPage.css';
 // import { useBaitoContext } from "../context/BaitoContext";
-import { BaitoContext } from "../context/BaitoContext";
-import SalaryDisplay from "../components/SalaryDisplay";
-import DailySalariesChart from "../components/DailySalariesChart";
-import MonthlySalariesChart from "../components/MonthlySalariesChart";
-import { useEffect, useState, useContext } from "react";
-import {
-  TextField,
-  IconButton,
-  Switch,
-  Paper,
-  Typography,
-  InputAdornment,
-} from "@mui/material";
-import { ChevronLeft, ChevronRight } from "@mui/icons-material";
-import Countup from "react-countup";
+import { BaitoContext } from '../context/BaitoProvider';
+import SalaryDisplay from '../components/SalaryDisplay';
+import DailySalariesChart from '../components/DailySalariesChart';
+import MonthlySalariesChart from '../components/MonthlySalariesChart';
+import { useEffect, useState, useContext } from 'react';
+import { TextField, IconButton, Switch, Paper, Typography, InputAdornment } from '@mui/material';
+import { ChevronLeft, ChevronRight } from '@mui/icons-material';
+import Countup from 'react-countup';
 
 function SalaryPage() {
-  const { fetchWorkdays, calculateDailySalary, calculateMonthlySalary } =
-    useContext(BaitoContext);
+  const { fetchWorkdays, calculateDailySalary, calculateMonthlySalary } = useContext(BaitoContext);
 
   const [savedDate, setSavedDate] = useState(new Date());
-  const [workdays, setWorkdays] = useState(
-    fetchWorkdays(savedDate.getFullYear(), savedDate.getMonth())
-  );
+  const [workdays, setWorkdays] = useState([]);
 
   useEffect(() => {
     setSavedDate(() => {
@@ -35,21 +25,18 @@ function SalaryPage() {
     });
   }, [setSavedDate]);
 
+  useEffect(() => {
+    setWorkdays(fetchWorkdays(savedDate.getFullYear(), savedDate.getMonth()));
+  }, [savedDate, fetchWorkdays]);
+
   const [isMonthView, setIsMonthView] = useState(true);
 
-  const [monthViewInputValue, setMonthViewInputValue] = useState(
-    formatDate(savedDate)
-  );
-  const [yearViewInputValue, setYearViewInputValue] = useState(
-    savedDate.getFullYear()
-  );
+  const [monthViewInputValue, setMonthViewInputValue] = useState(formatDate(savedDate));
+  const [yearViewInputValue, setYearViewInputValue] = useState(savedDate.getFullYear());
 
   // Daily salary vars
 
-  const dailySalaries = calculateDailySalary(
-    savedDate.getFullYear(),
-    savedDate.getMonth()
-  );
+  const dailySalaries = calculateDailySalary(savedDate.getFullYear(), savedDate.getMonth());
   const days = workdays.map((workday) => workday.day);
   const daysInMonth = savedDate.getDate();
   const dailySalariesArray = Array(daysInMonth).fill(0);
@@ -68,7 +55,7 @@ function SalaryPage() {
   });
   const yearlySalary = monthlySalaries.reduce((tempSum, a) => tempSum + a, 0);
 
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
     setMonthViewInputValue(formatDate(savedDate));
@@ -76,10 +63,7 @@ function SalaryPage() {
 
   // Format as YYYY-MM
   function formatDate(date) {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-      2,
-      "0"
-    )}`;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
   }
 
   const changeMonth = (delta) => {
@@ -91,7 +75,7 @@ function SalaryPage() {
       newDate.setDate(0); // set day to last day of prev month
       return newDate;
     });
-    setError("");
+    setError('');
   };
 
   const changeYear = (delta) => {
@@ -105,7 +89,7 @@ function SalaryPage() {
     const formatted = formatDate(date);
     setSavedDate(date);
     setMonthViewInputValue(formatted);
-    setError("");
+    setError('');
   };
 
   const handleToggle = (e) => {
@@ -117,11 +101,12 @@ function SalaryPage() {
     setMonthViewInputValue(value);
 
     if (/^\d{4}-(0[1-9]|1[0-2])$/.test(value)) {
-      const [year, month] = value.split("-").map(Number);
+      const [year, month] = value.split('-').map(Number);
       updateDate(new Date(year, month - 1));
     }
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handleBarClick = (e, { seriesId, dataIndex }) => {
     setIsMonthView((prev) => !prev);
     setMonthViewInputValue(`${yearViewInputValue}-${dataIndex + 1}`);
@@ -134,21 +119,18 @@ function SalaryPage() {
 
   const handleBlur = () => {
     if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(monthViewInputValue)) {
-      setError("Please use YYYY-MM format");
+      setError('Please use YYYY-MM format');
       setMonthViewInputValue(formatDate(savedDate));
     }
   };
 
   return (
     <div id="salary-page">
-      <Paper
-        elevation={1}
-        sx={{ display: "flex", alignItems: "center", gap: 2, padding: 2 }}
-      >
+      <Paper elevation={1} sx={{ display: 'flex', alignItems: 'center', gap: 2, padding: 2 }}>
         <Typography
           sx={{
-            color: !isMonthView ? "black" : "gray",
-            fontWeight: !isMonthView ? "bold" : "normal",
+            color: !isMonthView ? 'black' : 'gray',
+            fontWeight: !isMonthView ? 'bold' : 'normal',
           }}
         >
           Year View
@@ -158,8 +140,8 @@ function SalaryPage() {
 
         <Typography
           sx={{
-            color: isMonthView ? "black" : "gray",
-            fontWeight: isMonthView ? "bold" : "normal",
+            color: isMonthView ? 'black' : 'gray',
+            fontWeight: isMonthView ? 'bold' : 'normal',
           }}
         >
           Month View
@@ -186,7 +168,7 @@ function SalaryPage() {
               onChange={handleMonthInputChange}
               onBlur={handleBlur}
               error={!!error}
-              helperText={error || " "}
+              helperText={error || ' '}
               margin="normal"
               slotProps={{
                 input: {
@@ -229,7 +211,7 @@ function SalaryPage() {
               onChange={handleYearInputChange}
               onBlur={handleBlur}
               error={!!error}
-              helperText={error || " "}
+              helperText={error || ' '}
               margin="normal"
               slotProps={{
                 input: {
