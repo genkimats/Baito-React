@@ -3,9 +3,10 @@ import { Navigate } from 'react-router-dom';
 import { BaitoContext } from '../context/BaitoProvider';
 
 function ProtectedRoute({ children }) {
-  const { currentUser } = useContext(BaitoContext);
+  const { currentUser, isGuest } = useContext(BaitoContext);
 
-  if (!currentUser) {
+  // Allow access if the user is authenticated OR is a guest
+  if (!currentUser && !isGuest) {
     return <Navigate to="/login" />;
   }
 

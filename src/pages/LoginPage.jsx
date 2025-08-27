@@ -8,7 +8,7 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLogin, setIsLogin] = useState(true);
-  const { signup, login, loginWithGoogle } = useContext(BaitoContext); // Get loginWithGoogle from context
+  const { signup, login, loginWithGoogle, loginAsGuest } = useContext(BaitoContext);
   const navigate = useNavigate();
 
   const handleEmailSubmit = async (e) => {
@@ -27,12 +27,18 @@ function LoginPage() {
   };
 
   const handleGoogleLogin = async () => {
+    setError('');
     try {
       await loginWithGoogle();
       navigate('/');
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  const handleGuestLogin = () => {
+    loginAsGuest();
+    navigate('/');
   };
 
   return (
@@ -63,7 +69,7 @@ function LoginPage() {
             required
           />
           {error && (
-            <Typography color="error" sx={{ mt: 2 }}>
+            <Typography color="error" sx={{ mt: 2, textAlign: 'center' }}>
               {error}
             </Typography>
           )}
@@ -78,8 +84,13 @@ function LoginPage() {
         <Divider sx={{ my: 2 }}>OR</Divider>
 
         {/* Google Login Button */}
-        <Button fullWidth variant="outlined" onClick={handleGoogleLogin}>
+        <Button fullWidth variant="outlined" sx={{ mb: 1 }} onClick={handleGoogleLogin}>
           Sign in with Google
+        </Button>
+
+        {/* Guest Login Button */}
+        <Button fullWidth variant="text" onClick={handleGuestLogin}>
+          Continue as Guest
         </Button>
       </Paper>
     </Box>
