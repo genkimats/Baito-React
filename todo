@@ -1,17 +1,18 @@
 Problems:
 
-- change month using arrow keys does not change the month display
-- when adding workday, the wage automatically changes to the wage of current day
+1.  change month using arrow keys does not change the month display -> Partially fixed, issue sometimes occur
+2.  isModalOpen does not become true when user selects the worktime box (alleviated when clicking on a different day in calendar)
 
 TODO:
+
+- fix problem 2.
+
+Done:
 
 - support change in wage (add wage prop in workday)
   - add field for wage in add workday
   - default value is the WEEKDAY_WAGE and WEEKEND_WAGE
 - create modal for confirmation of add/remove/save
-
-Done:
-
 - Settings page
   - adjust generated ui (partially done)
   - implement mechanism to store settings to localStorage

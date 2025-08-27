@@ -106,8 +106,9 @@ function ManageWorkdayPage() {
         if (isAddMode) setIsAddMode(false);
         else setIsAddMode(true);
       } else if (e.key === "Enter") {
+        console.log(isModalOpen);
         if (isModalOpen) handleConfirm();
-        else handleShowConfirmation();
+        else setIsModalOpen(true);
       } else if (e.key === "ArrowRight") {
         setSavedDate((prev) => {
           const newDate = new Date(prev);
@@ -192,39 +193,45 @@ function ManageWorkdayPage() {
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    console.log("Confirmation cancelled.");
   };
 
   const handleConfirm = (e) => {
     e?.preventDefault?.();
     const selectedDay = savedDate.getDate();
     if (isAddMode) {
-      if (!workdays.some((workday) => workday.day === selectedDay)) {
-        addWorkday(savedDate.getFullYear(), savedDate.getMonth(), {
+      if (!workdays.some((savedWorkday) => savedWorkday.day === selectedDay)) {
+        const workday = {
           day: selectedDay,
           startTime: startTime,
           endTime: endTime,
           wage: currentWage,
-        });
+        };
+        addWorkday(savedDate.getFullYear(), savedDate.getMonth(), workday);
+        console.log("Workday Added:", workday);
       } else {
+        const workday = {
+          day: selectedDay,
+          startTime: startTime,
+          endTime: endTime,
+          wage: currentWage,
+        };
         updateWorkday(
           savedDate.getFullYear(),
           savedDate.getMonth(),
           selectedDay,
-          {
-            day: selectedDay,
-            startTime: startTime,
-            endTime: endTime,
-            wage: currentWage,
-          }
+          workday
         );
+        console.log("Updated Workday:", workday);
       }
     } else {
-      if (workdays.some((workday) => workday.day === selectedDay)) {
+      if (workdays.some((savedWorkday) => savedWorkday.day === selectedDay)) {
         deleteWorkday(
           savedDate.getFullYear(),
           savedDate.getMonth(),
           selectedDay
         );
+        console.log("Deleted Workday:", selectedDay);
       }
     }
     setIsModalOpen(false);
