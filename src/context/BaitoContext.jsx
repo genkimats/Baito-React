@@ -1,10 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from 'firebase/auth';
+
 import { BaitoContext } from './BaitoProvider';
 
 export const BaitoManager = ({ children }) => {
-  // --- State Definitions ---
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // ... (keep all your other state definitions: DEFAULT_START_TIME, etc.)
   const [DEFAULT_START_TIME, setDefaultStartTime] = useState({ hour: 17, minute: 0 });
   const [DEFAULT_END_TIME, setDefaultEndTime] = useState({ hour: 22, minute: 0 });
   const [WORKTIME_START, setWorktimeStart] = useState({ hour: 17, minute: 0 });
@@ -14,12 +24,27 @@ export const BaitoManager = ({ children }) => {
   const [COMMUTING_COST, setCommutingCost] = useState(230);
   const [WEEKDAY_WAGE, setWeekdayWage] = useState(1200);
   const [WEEKEND_WAGE, setWeekendWage] = useState(1500);
-  const [isLoading, setIsLoading] = useState(true); // To handle initial load
 
-  // --- Fetch Settings from Firebase on App Load ---
+  // --- Auth Functions ---
+  const signup = (email, password) => createUserWithEmailAndPassword(auth, email, password);
+  const login = (email, password) => signInWithEmailAndPassword(auth, email, password);
+  const logout = () => signOut(auth);
+
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setIsLoading(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  // --- Data functions now depend on currentUser ---
+  useEffect(() => {
+    if (!currentUser) return; // Don't fetch if no user
+
     const fetchSettings = async () => {
-      const settingsRef = doc(db, 'settings', 'user_settings');
+      // Each user gets their own settings document
+      const settingsRef = doc(db, 'users', currentUser.uid, 'settings', 'main');
       const docSnap = await getDoc(settingsRef);
 
       if (docSnap.exists()) {
@@ -33,65 +58,50 @@ export const BaitoManager = ({ children }) => {
         setWeekdayWage(settings.WEEKDAY_WAGE || 1200);
         setWeekendWage(settings.WEEKEND_WAGE || 1500);
       } else {
-        // FIX: If no document, create one with the default values
-        console.log('No settings document, creating one with default values.');
-        const defaultSettings = {
-          DEFAULT_START_TIME: { hour: 17, minute: 0 },
-          DEFAULT_END_TIME: { hour: 22, minute: 0 },
-          WORKTIME_START: { hour: 17, minute: 0 },
-          WORKTIME_END: { hour: 24, minute: 0 },
-          PAY_INTERVAL_MINUTES: 15,
-          COMMUTING_COST: 230,
-          WEEKDAY_WAGE: 1200,
-          WEEKEND_WAGE: 1500,
-        };
-        await setDoc(settingsRef, defaultSettings);
+        console.log('No settings document found for user. Using defaults.');
       }
-      setIsLoading(false);
     };
 
     fetchSettings();
-  }, []);
+  }, [currentUser]);
 
-  // --- New function to save settings to Firebase ---
   const saveSettings = async (newSettings) => {
-    const settingsRef = doc(db, 'settings', 'user_settings');
-    await setDoc(settingsRef, newSettings, { merge: true }); // merge: true prevents overwriting
-  };
-
-  // ... (rest of your context functions like fetchWorkdays, calculateDailySalary, etc.)
-  const formatDocId = (year, month) => {
-    return `${year}-${String(month + 1).padStart(2, '0')}`;
+    if (!currentUser) return;
+    const settingsRef = doc(db, 'users', currentUser.uid, 'settings', 'main');
+    await setDoc(settingsRef, newSettings, { merge: true });
   };
 
   const fetchWorkdays = async (year, month) => {
-    const docId = formatDocId(year, month);
-    const docRef = doc(db, 'workdays', docId);
+    if (!currentUser) return [];
+    const docId = `${year}-${String(month).padStart(2, '0')}`;
+    // Workdays are now stored under the user's UID
+    const docRef = doc(db, 'users', currentUser.uid, 'workdays', docId);
     const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      return docSnap.data().workdays || [];
-    }
-    return [];
+    return docSnap.exists() ? docSnap.data().workdays : [];
   };
+
   const addWorkday = async (year, month, newWorkday) => {
-    const docId = formatDocId(year, month);
-    const docRef = doc(db, 'workdays', docId);
+    if (!currentUser) return;
+    const docId = `${year}-${String(month).padStart(2, '0')}`;
+    const docRef = doc(db, 'users', currentUser.uid, 'workdays', docId);
     const workdays = await fetchWorkdays(year, month);
     const newWorkdays = [...workdays, newWorkday];
     await setDoc(docRef, { workdays: newWorkdays });
   };
 
   const updateWorkday = async (year, month, day, updatedWorkday) => {
-    const docId = formatDocId(year, month);
-    const docRef = doc(db, 'workdays', docId);
+    if (!currentUser) return;
+    const docId = `${year}-${String(month).padStart(2, '0')}`;
+    const docRef = doc(db, 'users', currentUser.uid, 'workdays', docId);
     const workdays = await fetchWorkdays(year, month);
     const newWorkdays = workdays.map((w) => (w.day === day ? updatedWorkday : w));
     await setDoc(docRef, { workdays: newWorkdays });
   };
 
   const deleteWorkday = async (year, month, day) => {
-    const docId = formatDocId(year, month);
-    const docRef = doc(db, 'workdays', docId);
+    if (!currentUser) return;
+    const docId = `${year}-${String(month).padStart(2, '0')}`;
+    const docRef = doc(db, 'users', currentUser.uid, 'workdays', docId);
     const workdays = await fetchWorkdays(year, month);
     const newWorkdays = workdays.filter((w) => w.day !== day);
     await setDoc(docRef, { workdays: newWorkdays });
@@ -127,6 +137,17 @@ export const BaitoManager = ({ children }) => {
   };
 
   const value = {
+    currentUser,
+    isLoading,
+    signup,
+    login,
+    logout,
+    saveSettings,
+    fetchWorkdays,
+    addWorkday,
+    updateWorkday,
+    deleteWorkday,
+    calculateDailySalary,
     DEFAULT_START_TIME,
     DEFAULT_END_TIME,
     WORKTIME_START,
@@ -136,7 +157,6 @@ export const BaitoManager = ({ children }) => {
     WEEKDAY_WAGE,
     WEEKEND_WAGE,
     TIME_BARRIER,
-    isLoading, // Pass loading state to components
     setDefaultStartTime,
     setDefaultEndTime,
     setWorktimeStart,
@@ -146,13 +166,7 @@ export const BaitoManager = ({ children }) => {
     setTimeBarrier,
     setWeekdayWage,
     setWeekendWage,
-    saveSettings, // Add the new save function
-    fetchWorkdays,
-    addWorkday,
-    updateWorkday,
-    deleteWorkday,
-    calculateDailySalary,
   };
 
-  return <BaitoContext.Provider value={value}>{children}</BaitoContext.Provider>;
+  return <BaitoContext.Provider value={value}>{!isLoading && children}</BaitoContext.Provider>;
 };
