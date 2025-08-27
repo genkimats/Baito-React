@@ -1,6 +1,6 @@
-import { useContext, useState, useEffect } from "react";
-import { BaitoContext } from "../context/BaitoContext";
-import "../css/SettingsPage.css";
+import { useContext, useState, useEffect } from 'react';
+import { BaitoContext } from '../context/BaitoContext';
+import '../css/SettingsPage.css';
 import {
   Paper,
   Typography,
@@ -11,7 +11,7 @@ import {
   MenuItem,
   Select,
   TextField,
-} from "@mui/material";
+} from '@mui/material';
 
 function SettingsPage() {
   const {
@@ -79,29 +79,29 @@ function SettingsPage() {
 
   const handleChange = (e, field) => {
     const newValue = parseInt(e.target.value);
-    if (field === "DefaultStartHour") {
+    if (field === 'DefaultStartHour') {
       setTempDefaultStartTime((prev) => ({ ...prev, hour: newValue }));
-    } else if (field === "DefaultStartMinute") {
+    } else if (field === 'DefaultStartMinute') {
       setTempDefaultStartTime((prev) => ({ ...prev, minute: newValue }));
-    } else if (field === "DefaultEndHour") {
+    } else if (field === 'DefaultEndHour') {
       setTempDefaultEndTime((prev) => ({ ...prev, hour: newValue }));
-    } else if (field === "DefaultEndMinute") {
+    } else if (field === 'DefaultEndMinute') {
       setTempDefaultEndTime((prev) => ({ ...prev, minute: newValue }));
-    } else if (field === "EarliestStartHour") {
+    } else if (field === 'EarliestStartHour') {
       setTempWorktimeStart((prev) => ({ ...prev, hour: newValue }));
-    } else if (field === "EarliestStartMinute") {
+    } else if (field === 'EarliestStartMinute') {
       setTempWorktimeStart((prev) => ({ ...prev, minute: newValue }));
-    } else if (field === "LatestEndHour") {
+    } else if (field === 'LatestEndHour') {
       setTempWorktimeEnd((prev) => ({ ...prev, hour: newValue }));
-    } else if (field === "LatestEndMinute") {
+    } else if (field === 'LatestEndMinute') {
       setTempWorktimeEnd((prev) => ({ ...prev, minute: newValue }));
-    } else if (field === "WeekdayWage") {
+    } else if (field === 'WeekdayWage') {
       setTempWeekdayWage(newValue);
-    } else if (field === "WeekendWage") {
+    } else if (field === 'WeekendWage') {
       setTempWeekendWage(newValue);
-    } else if (field === "CommutingCost") {
+    } else if (field === 'CommutingCost') {
       setTempCommutingCost(newValue);
-    } else if (field === "PayIntervalMinutes") {
+    } else if (field === 'PayIntervalMinutes') {
       setTempPayIntervalMinutes(newValue);
     }
   };
@@ -120,48 +120,44 @@ function SettingsPage() {
     setPayIntervalMinutes(tempPayIntervalMinutes);
 
     // Save to localStorage
-    localStorage.setItem("DefaultStartHour", tempDefaultStartTime.hour);
-    localStorage.setItem("DefaultStartMinute", tempDefaultStartTime.minute);
-    localStorage.setItem("DefaultEndHour", tempDefaultEndTime.hour);
-    localStorage.setItem("DefaultEndMinute", tempDefaultEndTime.minute);
-    localStorage.setItem("EarliestStartHour", tempWorktimeStart.hour);
-    localStorage.setItem("EarliestStartMinute", tempWorktimeStart.minute);
-    localStorage.setItem("LatestEndHour", tempWorktimeEnd.hour);
-    localStorage.setItem("LatestEndMinute", tempWorktimeEnd.minute);
-    localStorage.setItem("WeekdayWage", tempWeekdayWage);
-    localStorage.setItem("WeekendWage", tempWeekendWage);
-    localStorage.setItem("CommutingCost", tempCommutingCost);
-    localStorage.setItem("PayIntervalMinutes", tempPayIntervalMinutes);
+    localStorage.setItem('DefaultStartHour', tempDefaultStartTime.hour);
+    localStorage.setItem('DefaultStartMinute', tempDefaultStartTime.minute);
+    localStorage.setItem('DefaultEndHour', tempDefaultEndTime.hour);
+    localStorage.setItem('DefaultEndMinute', tempDefaultEndTime.minute);
+    localStorage.setItem('EarliestStartHour', tempWorktimeStart.hour);
+    localStorage.setItem('EarliestStartMinute', tempWorktimeStart.minute);
+    localStorage.setItem('LatestEndHour', tempWorktimeEnd.hour);
+    localStorage.setItem('LatestEndMinute', tempWorktimeEnd.minute);
+    localStorage.setItem('WeekdayWage', tempWeekdayWage);
+    localStorage.setItem('WeekendWage', tempWeekendWage);
+    localStorage.setItem('CommutingCost', tempCommutingCost);
+    localStorage.setItem('PayIntervalMinutes', tempPayIntervalMinutes);
   };
 
   const generateOptions = (start, end) => {
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i).map(
-      (value) => (
-        <MenuItem key={value} value={value}>
-          {value}
-        </MenuItem>
-      )
-    );
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i).map((value) => (
+      <MenuItem key={value} value={value}>
+        {value}
+      </MenuItem>
+    ));
   };
 
   const generateMinuteOptions = (step) => {
-    return Array.from({ length: Math.ceil(60 / step) }, (_, i) => i * step).map(
-      (value) => (
-        <MenuItem key={value} value={value}>
-          {value}
-        </MenuItem>
-      )
-    );
+    return Array.from({ length: Math.ceil(60 / step) }, (_, i) => i * step).map((value) => (
+      <MenuItem key={value} value={value}>
+        {value}
+      </MenuItem>
+    ));
   };
 
   return (
     <div className="page" id="settings-page">
-      <Paper elevation={3} sx={{ padding: 3, maxWidth: 600, margin: "0 auto" }}>
+      <Paper elevation={3} sx={{ padding: 3, maxWidth: 600, margin: '0 auto' }}>
         <Typography variant="h5" gutterBottom sx={{ marginBottom: 3 }}>
           Work Settings
         </Typography>
 
-        <Box component="form" sx={{ display: "grid", gap: 3 }}>
+        <Box component="form" sx={{ display: 'grid', gap: 3 }}>
           {/* Work Hours Section */}
           <Paper elevation={2} sx={{ padding: 3 }}>
             <Typography variant="h6" gutterBottom>
@@ -174,13 +170,10 @@ function SettingsPage() {
                   select
                   label="Hour"
                   value={tempDefaultStartTime.hour}
-                  onChange={(e) => handleChange(e, "DefaultStartHour")}
+                  onChange={(e) => handleChange(e, 'DefaultStartHour')}
                   sx={{ width: 90 }}
                 >
-                  {generateOptions(
-                    tempWorktimeStart.hour,
-                    tempWorktimeEnd.hour
-                  )}
+                  {generateOptions(tempWorktimeStart.hour, tempWorktimeEnd.hour)}
                 </TextField>
               </Grid>
               <Grid>
@@ -188,7 +181,7 @@ function SettingsPage() {
                   select
                   label="Minute"
                   value={tempDefaultStartTime.minute}
-                  onChange={(e) => handleChange(e, "DefaultStartMinute")}
+                  onChange={(e) => handleChange(e, 'DefaultStartMinute')}
                   sx={{ width: 90 }}
                 >
                   {generateMinuteOptions(PAY_INTERVAL_MINUTES)}
@@ -201,13 +194,10 @@ function SettingsPage() {
                     select
                     label="Hour"
                     value={tempDefaultEndTime.hour}
-                    onChange={(e) => handleChange(e, "DefaultEndHour")}
+                    onChange={(e) => handleChange(e, 'DefaultEndHour')}
                     sx={{ width: 90 }}
                   >
-                    {generateOptions(
-                      tempWorktimeStart.hour,
-                      tempWorktimeEnd.hour
-                    )}
+                    {generateOptions(tempWorktimeStart.hour, tempWorktimeEnd.hour)}
                   </TextField>
                 </Grid>
                 <Grid>
@@ -215,7 +205,7 @@ function SettingsPage() {
                     select
                     label="Minute"
                     value={tempDefaultEndTime.minute}
-                    onChange={(e) => handleChange(e, "DefaultEndMinute")}
+                    onChange={(e) => handleChange(e, 'DefaultEndMinute')}
                     sx={{ width: 90 }}
                   >
                     {generateMinuteOptions(PAY_INTERVAL_MINUTES)}
@@ -240,7 +230,7 @@ function SettingsPage() {
                     select
                     label="Hour"
                     value={tempWorktimeStart.hour}
-                    onChange={(e) => handleChange(e, "EarliestStartHour")}
+                    onChange={(e) => handleChange(e, 'EarliestStartHour')}
                     sx={{ width: 90 }}
                   >
                     {generateOptions(1, 24)}
@@ -251,7 +241,7 @@ function SettingsPage() {
                     select
                     label="Minute"
                     value={tempWorktimeStart.minute}
-                    onChange={(e) => handleChange(e, "EarliestStartMinute")}
+                    onChange={(e) => handleChange(e, 'EarliestStartMinute')}
                     sx={{ width: 90 }}
                   >
                     {generateMinuteOptions(PAY_INTERVAL_MINUTES)}
@@ -267,7 +257,7 @@ function SettingsPage() {
                     select
                     label="Hour"
                     value={tempWorktimeEnd.hour}
-                    onChange={(e) => handleChange(e, "LatestEndHour")}
+                    onChange={(e) => handleChange(e, 'LatestEndHour')}
                     sx={{ width: 90 }}
                   >
                     {generateOptions(1, 24)}
@@ -278,7 +268,7 @@ function SettingsPage() {
                     select
                     label="Minute"
                     value={tempWorktimeEnd.minute}
-                    onChange={(e) => handleChange(e, "LatestEndMinute")}
+                    onChange={(e) => handleChange(e, 'LatestEndMinute')}
                     sx={{ width: 90 }}
                   >
                     {generateMinuteOptions(PAY_INTERVAL_MINUTES)}
@@ -300,12 +290,10 @@ function SettingsPage() {
                   label="Weekday Wage"
                   type="number"
                   value={tempWeekdayWage}
-                  onChange={(e) => handleChange(e, "WeekdayWage")}
+                  onChange={(e) => handleChange(e, 'WeekdayWage')}
                   slotProps={{
                     input: {
-                      startAdornment: (
-                        <InputAdornment position="start">¥</InputAdornment>
-                      ),
+                      startAdornment: <InputAdornment position="start">¥</InputAdornment>,
                     },
                   }}
                 />
@@ -316,12 +304,10 @@ function SettingsPage() {
                   label="Weekend Wage"
                   type="number"
                   value={tempWeekendWage}
-                  onChange={(e) => handleChange(e, "WeekendWage")}
+                  onChange={(e) => handleChange(e, 'WeekendWage')}
                   slotProps={{
                     input: {
-                      startAdornment: (
-                        <InputAdornment position="start">¥</InputAdornment>
-                      ),
+                      startAdornment: <InputAdornment position="start">¥</InputAdornment>,
                     },
                   }}
                 />
@@ -341,12 +327,10 @@ function SettingsPage() {
                   label="Commuting Cost"
                   type="number"
                   value={tempCommutingCost}
-                  onChange={(e) => handleChange(e, "CommutingCost")}
+                  onChange={(e) => handleChange(e, 'CommutingCost')}
                   slotProps={{
                     input: {
-                      startAdornment: (
-                        <InputAdornment position="start">¥</InputAdornment>
-                      ),
+                      startAdornment: <InputAdornment position="start">¥</InputAdornment>,
                     },
                   }}
                 />
@@ -357,12 +341,10 @@ function SettingsPage() {
                   label="Pay Interval"
                   value={tempPayIntervalMinutes}
                   select
-                  onChange={(e) => handleChange(e, "PayIntervalMinutes")}
+                  onChange={(e) => handleChange(e, 'PayIntervalMinutes')}
                   slotProps={{
                     input: {
-                      endAdornment: (
-                        <InputAdornment position="start">min</InputAdornment>
-                      ),
+                      endAdornment: <InputAdornment position="start">min</InputAdornment>,
                     },
                   }}
                 >
@@ -379,8 +361,8 @@ function SettingsPage() {
           {/* Action Buttons */}
           <Box
             sx={{
-              display: "flex",
-              justifyContent: "flex-end",
+              display: 'flex',
+              justifyContent: 'flex-end',
               gap: 2,
               marginTop: 2,
             }}
