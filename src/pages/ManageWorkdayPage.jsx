@@ -31,7 +31,7 @@ function ManageWorkdayPage() {
   } = useContext(BaitoContext);
 
   const [savedDate, setSavedDate] = useState(new Date());
-  const [workdays, setWorkdays] = useState(fetchWorkdays());
+  const [workdays, setWorkdays] = useState([]);
 
   const [currentWage, setCurrentWage] = useState(
     savedDate.getDay() == 0 || savedDate.getDay() == 6 ? WEEKEND_WAGE : WEEKDAY_WAGE
@@ -137,20 +137,24 @@ function ManageWorkdayPage() {
   );
 
   useEffect(() => {
-    setCurrentWage(
-      savedDate.getDay() == 0 || savedDate.getDay() == 6 ? WEEKEND_WAGE : WEEKDAY_WAGE
-    );
-    const workdaysForMonth = fetchWorkdays(savedDate.getFullYear(), savedDate.getMonth());
-    setWorkdays(workdaysForMonth);
+    const loadWorkdays = async () => {
+      const workdaysForMonth = await fetchWorkdays(savedDate.getFullYear(), savedDate.getMonth());
+      setWorkdays(workdaysForMonth);
 
-    const workday = workdaysForMonth.find((w) => w.day === savedDate.getDate());
-    if (workday) {
-      setStartTime(workday.startTime);
-      setEndTime(workday.endTime);
-    } else {
-      setStartTime(DEFAULT_START_TIME);
-      setEndTime(DEFAULT_END_TIME);
-    }
+      const workday = workdaysForMonth.find((w) => w.day === savedDate.getDate());
+      if (workday) {
+        setStartTime(workday.startTime);
+        setEndTime(workday.endTime);
+        setCurrentWage(workday.wage);
+      } else {
+        setStartTime(DEFAULT_START_TIME);
+        setEndTime(DEFAULT_END_TIME);
+        setCurrentWage(
+          savedDate.getDay() === 0 || savedDate.getDay() === 6 ? WEEKEND_WAGE : WEEKDAY_WAGE
+        );
+      }
+    };
+    loadWorkdays();
   }, [savedDate, fetchWorkdays, WEEKDAY_WAGE, WEEKEND_WAGE, DEFAULT_START_TIME, DEFAULT_END_TIME]);
 
   useEffect(() => {

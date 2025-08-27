@@ -1,112 +1,106 @@
 import React, { useState, useEffect } from 'react';
+import { db } from '../firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { BaitoContext } from './BaitoProvider';
 
 export const BaitoManager = ({ children }) => {
-  // Configs
-
-  const [DEFAULT_START_TIME, setDefaultStartTime] = useState({
-    hour: 17,
-    minute: 0,
-  });
-  const [DEFAULT_END_TIME, setDefaultEndTime] = useState({
-    hour: 22,
-    minute: 0,
-  });
-
+  // --- State Definitions ---
+  const [DEFAULT_START_TIME, setDefaultStartTime] = useState({ hour: 17, minute: 0 });
+  const [DEFAULT_END_TIME, setDefaultEndTime] = useState({ hour: 22, minute: 0 });
   const [WORKTIME_START, setWorktimeStart] = useState({ hour: 17, minute: 0 });
   const [WORKTIME_END, setWorktimeEnd] = useState({ hour: 24, minute: 0 });
-
   const [PAY_INTERVAL_MINUTES, setPayIntervalMinutes] = useState(15);
-
   const [TIME_BARRIER, setTimeBarrier] = useState({ hour: 22, minute: 0 });
-
   const [COMMUTING_COST, setCommutingCost] = useState(230);
-
   const [WEEKDAY_WAGE, setWeekdayWage] = useState(1200);
   const [WEEKEND_WAGE, setWeekendWage] = useState(1500);
+  const [isLoading, setIsLoading] = useState(true); // To handle initial load
 
+  // --- Fetch Settings from Firebase on App Load ---
   useEffect(() => {
-    const setDefaultIfNotExists = (key, defaultValue) => {
-      if (localStorage.getItem(key) === null) {
-        localStorage.setItem(key, defaultValue);
+    const fetchSettings = async () => {
+      const settingsRef = doc(db, 'settings', 'user_settings');
+      const docSnap = await getDoc(settingsRef);
+
+      if (docSnap.exists()) {
+        const settings = docSnap.data();
+        setDefaultStartTime(settings.DEFAULT_START_TIME || { hour: 17, minute: 0 });
+        setDefaultEndTime(settings.DEFAULT_END_TIME || { hour: 22, minute: 0 });
+        setWorktimeStart(settings.WORKTIME_START || { hour: 17, minute: 0 });
+        setWorktimeEnd(settings.WORKTIME_END || { hour: 24, minute: 0 });
+        setPayIntervalMinutes(settings.PAY_INTERVAL_MINUTES || 15);
+        setCommutingCost(settings.COMMUTING_COST || 230);
+        setWeekdayWage(settings.WEEKDAY_WAGE || 1200);
+        setWeekendWage(settings.WEEKEND_WAGE || 1500);
+      } else {
+        // FIX: If no document, create one with the default values
+        console.log('No settings document, creating one with default values.');
+        const defaultSettings = {
+          DEFAULT_START_TIME: { hour: 17, minute: 0 },
+          DEFAULT_END_TIME: { hour: 22, minute: 0 },
+          WORKTIME_START: { hour: 17, minute: 0 },
+          WORKTIME_END: { hour: 24, minute: 0 },
+          PAY_INTERVAL_MINUTES: 15,
+          COMMUTING_COST: 230,
+          WEEKDAY_WAGE: 1200,
+          WEEKEND_WAGE: 1500,
+        };
+        await setDoc(settingsRef, defaultSettings);
       }
+      setIsLoading(false);
     };
 
-    setDefaultIfNotExists('DefaultStartHour', 17);
-    setDefaultIfNotExists('DefaultStartMinute', 0);
-    setDefaultIfNotExists('DefaultEndHour', 22);
-    setDefaultIfNotExists('DefaultEndMinute', 0);
-    setDefaultIfNotExists('EarliestStartHour', 17);
-    setDefaultIfNotExists('EarliestStartMinute', 0);
-    setDefaultIfNotExists('LatestEndHour', 24);
-    setDefaultIfNotExists('LatestEndMinute', 0);
-    setDefaultIfNotExists('WeekdayWage', 1200);
-    setDefaultIfNotExists('WeekendWage', 1500);
-    setDefaultIfNotExists('CommutingCost', 230);
-
-    setDefaultStartTime({
-      hour: parseInt(localStorage.getItem('DefaultStartHour')) || 17,
-      minute: parseInt(localStorage.getItem('DefaultStartMinute')) || 0,
-    });
-    setDefaultEndTime({
-      hour: parseInt(localStorage.getItem('DefaultEndHour')) || 22,
-      minute: parseInt(localStorage.getItem('DefaultEndMinute')) || 0,
-    });
-    setWorktimeStart({
-      hour: parseInt(localStorage.getItem('EarliestStartHour')) || 17,
-      minute: parseInt(localStorage.getItem('EarliestStartMinute')) || 0,
-    });
-    setWorktimeEnd({
-      hour: parseInt(localStorage.getItem('LatestEndHour')) || 24,
-      minute: parseInt(localStorage.getItem('LatestEndMinute')) || 0,
-    });
-    setWeekdayWage(parseInt(localStorage.getItem('WeekdayWage')) || 1200);
-    setWeekendWage(parseInt(localStorage.getItem('WeekendWage')) || 1500);
-    setCommutingCost(parseInt(localStorage.getItem('CommutingCost')) || 230);
+    fetchSettings();
   }, []);
 
-  // Managing workdays
+  // --- New function to save settings to Firebase ---
+  const saveSettings = async (newSettings) => {
+    const settingsRef = doc(db, 'settings', 'user_settings');
+    await setDoc(settingsRef, newSettings, { merge: true }); // merge: true prevents overwriting
+  };
 
-  const fetchWorkdays = (year, month) => {
-    let workdays = [];
-    const workdaysStr = localStorage.getItem(`${year}-${String(month).padStart(2, '0')}`);
-    try {
-      if (workdaysStr) {
-        workdays = JSON.parse(workdaysStr);
-      }
-    } catch (error) {
-      console.error('Failed to parse saved workdays:', error);
+  // ... (rest of your context functions like fetchWorkdays, calculateDailySalary, etc.)
+  const formatDocId = (year, month) => {
+    return `${year}-${String(month + 1).padStart(2, '0')}`;
+  };
+
+  const fetchWorkdays = async (year, month) => {
+    const docId = formatDocId(year, month);
+    const docRef = doc(db, 'workdays', docId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data().workdays || [];
     }
-    return workdays;
+    return [];
+  };
+  const addWorkday = async (year, month, newWorkday) => {
+    const docId = formatDocId(year, month);
+    const docRef = doc(db, 'workdays', docId);
+    const workdays = await fetchWorkdays(year, month);
+    const newWorkdays = [...workdays, newWorkday];
+    await setDoc(docRef, { workdays: newWorkdays });
   };
 
-  const formatYearMonth = (year, month) => {
-    return `${year}-${String(month).padStart(2, '0')}`;
+  const updateWorkday = async (year, month, day, updatedWorkday) => {
+    const docId = formatDocId(year, month);
+    const docRef = doc(db, 'workdays', docId);
+    const workdays = await fetchWorkdays(year, month);
+    const newWorkdays = workdays.map((w) => (w.day === day ? updatedWorkday : w));
+    await setDoc(docRef, { workdays: newWorkdays });
   };
 
-  const addWorkday = (year, month, newWorkday) => {
-    let workdays = fetchWorkdays(year, month);
-    if (!workdays.some((workday) => workday.day === newWorkday.day)) {
-      const newWorkdays = [...workdays, newWorkday];
-      localStorage.setItem(formatYearMonth(year, month), JSON.stringify(newWorkdays));
-    }
-  };
-
-  const updateWorkday = (year, month, day, updatedWorkday) => {
-    const weekdays = fetchWorkdays(year, month);
-    const newWorkdays = weekdays.map((w) => (w.day === day ? updatedWorkday : w));
-    localStorage.setItem(formatYearMonth(year, month), JSON.stringify(newWorkdays));
-  };
-
-  const deleteWorkday = (year, month, day) => {
-    const workdays = fetchWorkdays(year, month);
+  const deleteWorkday = async (year, month, day) => {
+    const docId = formatDocId(year, month);
+    const docRef = doc(db, 'workdays', docId);
+    const workdays = await fetchWorkdays(year, month);
     const newWorkdays = workdays.filter((w) => w.day !== day);
-    localStorage.setItem(formatYearMonth(year, month), JSON.stringify(newWorkdays));
+    await setDoc(docRef, { workdays: newWorkdays });
   };
+  const calculateDailySalary = (workdays) => {
+    if (!workdays || workdays.length === 0) {
+      return [];
+    }
 
-  // Checking Salary
-
-  const calculateDailySalary = (year, month) => {
     let dailySalary = [];
 
     const calculateSingleDay = (workday) => {
@@ -116,7 +110,6 @@ export const BaitoManager = ({ children }) => {
         workday.endTime.hour >= TIME_BARRIER.hour &&
         workday.endTime.minute > TIME_BARRIER.minute
       ) {
-        // when over time-barrier
         singleDaySalary += (TIME_BARRIER.hour - workday.startTime.hour) * wage;
         singleDaySalary += ((TIME_BARRIER.minute - workday.startTime.minute) / 60) * wage;
         singleDaySalary += (workday.endTime.hour - TIME_BARRIER.hour) * wage * 1.25;
@@ -128,20 +121,9 @@ export const BaitoManager = ({ children }) => {
       singleDaySalary += 2 * COMMUTING_COST;
       dailySalary.push(singleDaySalary);
     };
-    const monthWorkdays = fetchWorkdays(year, month);
-    monthWorkdays.forEach((workday) => calculateSingleDay(workday));
-    return dailySalary;
-  };
 
-  const calculateMonthlySalary = (year) => {
-    const allMonths = Array.from({ length: 12 }, (_, i) => i + 1);
-    let monthlySalaries = [];
-    allMonths.forEach((month) => {
-      monthlySalaries.push(
-        calculateDailySalary(year, month).reduce((tempSum, a) => tempSum + a, 0)
-      );
-    });
-    return monthlySalaries;
+    workdays.forEach((workday) => calculateSingleDay(workday));
+    return dailySalary;
   };
 
   const value = {
@@ -154,6 +136,7 @@ export const BaitoManager = ({ children }) => {
     WEEKDAY_WAGE,
     WEEKEND_WAGE,
     TIME_BARRIER,
+    isLoading, // Pass loading state to components
     setDefaultStartTime,
     setDefaultEndTime,
     setWorktimeStart,
@@ -163,12 +146,12 @@ export const BaitoManager = ({ children }) => {
     setTimeBarrier,
     setWeekdayWage,
     setWeekendWage,
+    saveSettings, // Add the new save function
     fetchWorkdays,
     addWorkday,
     updateWorkday,
     deleteWorkday,
     calculateDailySalary,
-    calculateMonthlySalary,
   };
 
   return <BaitoContext.Provider value={value}>{children}</BaitoContext.Provider>;

@@ -1,5 +1,4 @@
 import '../css/SalaryPage.css';
-// import { useBaitoContext } from "../context/BaitoContext";
 import { BaitoContext } from '../context/BaitoProvider';
 import SalaryDisplay from '../components/SalaryDisplay';
 import DailySalariesChart from '../components/DailySalariesChart';
@@ -7,89 +6,69 @@ import MonthlySalariesChart from '../components/MonthlySalariesChart';
 import { useEffect, useState, useContext } from 'react';
 import { TextField, IconButton, Switch, Paper, Typography, InputAdornment } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
-import Countup from 'react-countup';
 
 function SalaryPage() {
-  const { fetchWorkdays, calculateDailySalary, calculateMonthlySalary } = useContext(BaitoContext);
+  const { fetchWorkdays, calculateDailySalary } = useContext(BaitoContext);
 
   const [savedDate, setSavedDate] = useState(new Date());
   const [workdays, setWorkdays] = useState([]);
-
-  useEffect(() => {
-    setSavedDate(() => {
-      const newDate = new Date();
-      newDate.setDate(1); // set day that all months have
-      newDate.setMonth(newDate.getMonth() + 1); // set to next month
-      newDate.setDate(0); // set day to last day of prev month
-      return newDate;
-    });
-  }, [setSavedDate]);
-
-  useEffect(() => {
-    setWorkdays(fetchWorkdays(savedDate.getFullYear(), savedDate.getMonth()));
-  }, [savedDate, fetchWorkdays]);
-
+  const [monthlySalaries, setMonthlySalaries] = useState(Array(12).fill(0));
   const [isMonthView, setIsMonthView] = useState(true);
-
   const [monthViewInputValue, setMonthViewInputValue] = useState(formatDate(savedDate));
   const [yearViewInputValue, setYearViewInputValue] = useState(savedDate.getFullYear());
-
-  // Daily salary vars
-
-  const dailySalaries = calculateDailySalary(savedDate.getFullYear(), savedDate.getMonth());
-  const days = workdays.map((workday) => workday.day);
-  const daysInMonth = savedDate.getDate();
-  const dailySalariesArray = Array(daysInMonth).fill(0);
-  days.map((day, index) => {
-    dailySalariesArray[day - 1] = dailySalaries[index];
-  });
-  const monthlySalary = dailySalaries.reduce((tempSum, a) => tempSum + a, 0);
-
-  // Monthly salary vars
-
-  const monthlySalaries = calculateMonthlySalary(savedDate.getFullYear());
-  const months = Array.from({ length: 12 }, (_, i) => i + 1);
-  const monthlySalariesArray = Array(12).fill(0);
-  months.map((month) => {
-    monthlySalariesArray[month - 1] = monthlySalaries[month - 1];
-  });
-  const yearlySalary = monthlySalaries.reduce((tempSum, a) => tempSum + a, 0);
-
   const [error, setError] = useState('');
 
   useEffect(() => {
-    setMonthViewInputValue(formatDate(savedDate));
-  }, [savedDate]);
+    const loadWorkdays = async () => {
+      // FIX: Pass the 0-indexed month directly. The context now handles the +1.
+      const data = await fetchWorkdays(savedDate.getFullYear(), savedDate.getMonth());
+      setWorkdays(data);
+    };
+    loadWorkdays();
+  }, [savedDate, fetchWorkdays]);
 
-  // Format as YYYY-MM
+  useEffect(() => {
+    const loadYearlySalaries = async () => {
+      const allMonths = Array.from({ length: 12 }, (_, i) => i); // Use 0-11 for months
+      const salaries = await Promise.all(
+        allMonths.map(async (month) => {
+          const monthWorkdays = await fetchWorkdays(yearViewInputValue, month);
+          return calculateDailySalary(monthWorkdays).reduce((sum, a) => sum + a, 0);
+        })
+      );
+      setMonthlySalaries(salaries);
+    };
+
+    if (!isMonthView) {
+      loadYearlySalaries();
+    }
+  }, [yearViewInputValue, isMonthView, fetchWorkdays, calculateDailySalary]);
+
+  // --- Calculations ---
+  const dailySalaries = calculateDailySalary(workdays);
+  const daysInMonth = new Date(savedDate.getFullYear(), savedDate.getMonth() + 1, 0).getDate();
+  const dailySalariesArray = Array(daysInMonth).fill(0);
+  workdays.forEach((workday) => {
+    const index = workdays.findIndex((w) => w.day === workday.day);
+    if (index !== -1) {
+      dailySalariesArray[workday.day - 1] = dailySalaries[index];
+    }
+  });
+  const monthlySalary = dailySalaries.reduce((tempSum, a) => tempSum + a, 0);
+  const yearlySalary = monthlySalaries.reduce((tempSum, a) => tempSum + a, 0);
+
+  // --- Helper Functions ---
   function formatDate(date) {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
   }
 
   const changeMonth = (delta) => {
-    setSavedDate((prev) => {
-      const newDate = new Date(prev);
-      newDate.setDate(1); // set day that all months have
-      newDate.setMonth(newDate.getMonth() + delta);
-      newDate.setMonth(newDate.getMonth() + 1); // set to next month
-      newDate.setDate(0); // set day to last day of prev month
-      return newDate;
-    });
+    setSavedDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1));
     setError('');
   };
 
   const changeYear = (delta) => {
-    setYearViewInputValue((prev) => {
-      const newYear = prev + delta;
-      return newYear;
-    });
-  };
-
-  const updateDate = (date) => {
-    const formatted = formatDate(date);
-    setSavedDate(date);
-    setMonthViewInputValue(formatted);
-    setError('');
+    setYearViewInputValue((prev) => prev + delta);
   };
 
   const handleToggle = (e) => {
@@ -99,22 +78,23 @@ function SalaryPage() {
   const handleMonthInputChange = (e) => {
     const value = e.target.value;
     setMonthViewInputValue(value);
-
     if (/^\d{4}-(0[1-9]|1[0-2])$/.test(value)) {
       const [year, month] = value.split('-').map(Number);
-      updateDate(new Date(year, month - 1));
+      setSavedDate(new Date(year, month - 1, 1));
+      setError('');
     }
-  };
-
-  // eslint-disable-next-line no-unused-vars
-  const handleBarClick = (e, { seriesId, dataIndex }) => {
-    setIsMonthView((prev) => !prev);
-    setMonthViewInputValue(`${yearViewInputValue}-${dataIndex + 1}`);
   };
 
   const handleYearInputChange = (e) => {
     const value = e.target.value;
-    setYearViewInputValue(value);
+    if (/^\d{4}$/.test(value)) {
+      setYearViewInputValue(parseInt(value));
+    }
+  };
+
+  const handleBarClick = (event, { dataIndex }) => {
+    setIsMonthView(true);
+    setSavedDate(new Date(yearViewInputValue, dataIndex, 1));
   };
 
   const handleBlur = () => {
@@ -123,6 +103,10 @@ function SalaryPage() {
       setMonthViewInputValue(formatDate(savedDate));
     }
   };
+
+  useEffect(() => {
+    setMonthViewInputValue(formatDate(savedDate));
+  }, [savedDate]);
 
   return (
     <div id="salary-page">
@@ -135,9 +119,7 @@ function SalaryPage() {
         >
           Year View
         </Typography>
-
         <Switch checked={isMonthView} onChange={handleToggle} color="primary" />
-
         <Typography
           sx={{
             color: isMonthView ? 'black' : 'gray',
@@ -147,10 +129,10 @@ function SalaryPage() {
           Month View
         </Typography>
       </Paper>
+
       {isMonthView ? (
         <>
           <Paper
-            className="monthView"
             elevation={3}
             sx={{
               paddingX: 2,
@@ -170,71 +152,53 @@ function SalaryPage() {
               error={!!error}
               helperText={error || ' '}
               margin="normal"
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => changeMonth(-1)} size="small">
-                        <ChevronLeft />
-                      </IconButton>
-                      <IconButton onClick={() => changeMonth(1)} size="small">
-                        <ChevronRight />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => changeMonth(-1)} size="small">
+                      <ChevronLeft />
+                    </IconButton>
+                    <IconButton onClick={() => changeMonth(1)} size="small">
+                      <ChevronRight />
+                    </IconButton>
+                  </InputAdornment>
+                ),
               }}
             />
           </Paper>
-
           <DailySalariesChart salaries={dailySalariesArray} />
-          <SalaryDisplay salary={monthlySalary}></SalaryDisplay>
+          <SalaryDisplay salary={monthlySalary} />
         </>
       ) : (
         <>
           <Paper
-            className="yearView"
             elevation={3}
-            sx={{
-              paddingX: 2,
-              paddingBottom: 0,
-              paddingTop: 0.25,
-              maxWidth: 300,
-              height: 90,
-              // marginBottom: 10,
-            }}
+            sx={{ paddingX: 2, paddingBottom: 0, paddingTop: 0.25, maxWidth: 300, height: 90 }}
           >
             <TextField
               fullWidth
               label="YYYY"
               value={yearViewInputValue}
               onChange={handleYearInputChange}
-              onBlur={handleBlur}
-              error={!!error}
-              helperText={error || ' '}
+              type="number"
+              helperText={' '}
               margin="normal"
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => changeYear(-1)} size="small">
-                        <ChevronLeft />
-                      </IconButton>
-                      <IconButton onClick={() => changeYear(1)} size="small">
-                        <ChevronRight />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => changeYear(-1)} size="small">
+                      <ChevronLeft />
+                    </IconButton>
+                    <IconButton onClick={() => changeYear(1)} size="small">
+                      <ChevronRight />
+                    </IconButton>
+                  </InputAdornment>
+                ),
               }}
             />
           </Paper>
-
-          <MonthlySalariesChart
-            salaries={monthlySalariesArray}
-            onItemClick={handleBarClick}
-          ></MonthlySalariesChart>
-          <SalaryDisplay salary={yearlySalary}></SalaryDisplay>
+          <MonthlySalariesChart salaries={monthlySalaries} onItemClick={handleBarClick} />
+          <SalaryDisplay salary={yearlySalary} />
         </>
       )}
     </div>
