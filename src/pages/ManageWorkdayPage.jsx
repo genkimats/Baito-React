@@ -140,8 +140,18 @@ function ManageWorkdayPage() {
     setCurrentWage(
       savedDate.getDay() == 0 || savedDate.getDay() == 6 ? WEEKEND_WAGE : WEEKDAY_WAGE
     );
-    setWorkdays(fetchWorkdays(savedDate.getFullYear(), savedDate.getMonth()));
-  }, [savedDate, fetchWorkdays, WEEKDAY_WAGE, WEEKEND_WAGE]);
+    const workdaysForMonth = fetchWorkdays(savedDate.getFullYear(), savedDate.getMonth());
+    setWorkdays(workdaysForMonth);
+
+    const workday = workdaysForMonth.find((w) => w.day === savedDate.getDate());
+    if (workday) {
+      setStartTime(workday.startTime);
+      setEndTime(workday.endTime);
+    } else {
+      setStartTime(DEFAULT_START_TIME);
+      setEndTime(DEFAULT_END_TIME);
+    }
+  }, [savedDate, fetchWorkdays, WEEKDAY_WAGE, WEEKEND_WAGE, DEFAULT_START_TIME, DEFAULT_END_TIME]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress);
