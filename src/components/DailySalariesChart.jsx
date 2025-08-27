@@ -1,9 +1,10 @@
-import React from "react";
-import { BarChart } from "@mui/x-charts";
-import "../css/DailySalariesChart.css";
+import React from 'react';
+import { BarChart } from '@mui/x-charts';
+import '../css/DailySalariesChart.css';
 
 const DailySalariesChart = ({ salaries }) => {
   // Create array for all days in month (1-31)
+  console.log('salaries in DailySalariesChart:', salaries);
   const allDays = Array.from({ length: salaries.length }, (_, i) => i + 1);
 
   // Merge with salaries data (fill missing days with 0)
@@ -18,9 +19,9 @@ const DailySalariesChart = ({ salaries }) => {
         dataset={chartData}
         xAxis={[
           {
-            scaleType: "band",
-            dataKey: "day",
-            label: "Day of Month",
+            scaleType: 'band',
+            dataKey: 'day',
+            label: 'Day of Month',
           },
         ]}
         yAxis={[
@@ -31,9 +32,9 @@ const DailySalariesChart = ({ salaries }) => {
         ]}
         series={[
           {
-            dataKey: "salary",
-            label: "Daily Salary",
-            color: "#4caf50",
+            dataKey: 'salary',
+            label: 'Daily Salary',
+            color: '#4caf50',
           },
         ]}
       />
