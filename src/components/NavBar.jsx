@@ -1,12 +1,16 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BaitoContext } from '../context/BaitoProvider';
-import { Button, Typography } from '@mui/material';
+import { BaitoContext } from '../context/BaitoContext';
+import { useThemeContext } from '../context/ThemeContext';
+import { Button, IconButton } from '@mui/material'; // Import IconButton
+import Brightness3Icon from '@mui/icons-material/Brightness3'; // Moon icon
+import Brightness7Icon from '@mui/icons-material/Brightness7'; // Sun icon
 import MigrationModal from './MigrationModal';
 import '../css/NavBar.css';
 
 function NavBar() {
   const { currentUser, isGuest, logout } = useContext(BaitoContext);
+  const { mode, toggleColorMode } = useThemeContext(); // Get mode and toggle function
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -61,6 +65,9 @@ function NavBar() {
               Login
             </Link>
           )}
+          <IconButton sx={{ color: 'white' }} onClick={toggleColorMode}>
+            {mode === 'dark' ? <Brightness7Icon /> : <Brightness3Icon />}
+          </IconButton>
         </div>
       </nav>
 

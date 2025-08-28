@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { BaitoContext } from '../context/BaitoProvider';
+import { BaitoContext } from '../context/BaitoContext';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Paper, Typography, Box, Divider } from '@mui/material';
 

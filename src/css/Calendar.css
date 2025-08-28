@@ -1,60 +1,67 @@
 .react-calendar {
   width: 500px;
   justify-self: center;
+  background-color: var(--calendar-bg); /* Use variable */
+  color: var(--calendar-text-color); /* Use variable */
+  border: 1px solid var(--calendar-tile-hover-bg); /* Use variable for subtle border */
+}
 
-  .react-calendar__navigation {
-    display: flex;
-    .react-calendar__navigation__arrow {
-      height: 40px;
-      background-color: rgb(228, 228, 228);
-      color: black;
-    }
+.react-calendar__navigation {
+  display: flex;
+}
 
-    .react-calendar__navigation__label {
-      font-size: 1.5rem;
-      padding: 0px;
-      background-color: rgb(228, 228, 228);
-      color: black;
-    }
-  }
+.react-calendar__navigation__arrow {
+  height: 40px;
+  background-color: var(--calendar-bg); /* Use variable */
+  color: var(--calendar-text-color); /* Use variable */
+}
 
-  .workday {
-    background-color: rgb(0, 195, 255) !important;
-  }
+.react-calendar__navigation__label {
+  font-size: 1.5rem;
+  padding: 0px;
+  background-color: var(--calendar-bg); /* Use variable */
+  color: var(--calendar-text-color); /* Use variable */
+}
 
-  .react-calendar__tile {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 30px;
-    padding: 0;
-    background-color: rgb(228, 228, 228);
-    color: black;
-  }
+.workday {
+  background-color: var(--calendar-workday-bg) !important; /* Use variable */
+}
 
-  .react-calendar__tile:hover {
-    background: rgb(201, 203, 203);
-  }
+.react-calendar__tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  padding: 0;
+  background-color: var(--calendar-bg); /* Use variable */
+  color: var(--calendar-text-color); /* Use variable */
+  border: none; /* Remove default borders */
+}
 
-  .react-calendar__month-view__weekdays__weekday {
-    font-size: 1.1rem;
-    color: rgb(15, 70, 15);
-  }
+.react-calendar__tile:hover {
+  background: var(--calendar-tile-hover-bg); /* Use variable */
+}
 
-  .react-calendar__tile--active {
-    background: #6c34dc !important;
-    color: white;
-  }
+.react-calendar__month-view__weekdays__weekday {
+  font-size: 1.1rem;
+  color: var(--calendar-text-color); /* Use variable */
+  opacity: 0.7; /* Make weekdays slightly less prominent */
+}
 
-  .react-calendar__tile--active:enabled:hover,
-  .react-calendar__tile--active:enabled:focus {
-    background: #e70220;
-  }
+.react-calendar__tile--active {
+  background: var(--calendar-active-bg) !important; /* Use variable */
+  color: var(--calendar-active-text-color) !important; /* Use variable */
+}
 
-  .react-calendar__tile,
-  .react-calendar__month-view__days__day {
-    font-size: 1.2rem;
-  }
+.react-calendar__tile--active:enabled:hover,
+.react-calendar__tile--active:enabled:focus {
+  background: var(--calendar-active-bg) !important; /* Use variable */
+}
+
+.react-calendar__tile,
+.react-calendar__month-view__days__day {
+  font-size: 1.2rem;
+  border: 0.5px solid lightgray;
 }
 
 @media (max-width: 500px) {

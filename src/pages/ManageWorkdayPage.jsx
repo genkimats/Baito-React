@@ -11,7 +11,7 @@ import {
   Paper,
   InputAdornment,
 } from '@mui/material';
-import { BaitoContext } from '../context/BaitoProvider.jsx';
+import { BaitoContext } from '../context/BaitoContext.jsx';
 import ConfirmationModal from '../components/ConfirmationModal.jsx';
 import '../css/ManageWorkdayPage.css';
 
@@ -289,7 +289,14 @@ function ManageWorkdayPage() {
                   alignItems: 'center',
                 }}
               >
-                <Typography sx={{ color: 'black', whiteSpace: 'nowrap' }}>Start Time</Typography>
+                <Typography
+                  sx={{
+                    color: !isAddMode ? 'text.primary' : 'text.secondary',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Start Time
+                </Typography>
                 <TextField
                   select
                   value={startTime.hour}
@@ -333,7 +340,14 @@ function ManageWorkdayPage() {
                   alignItems: 'center',
                 }}
               >
-                <Typography sx={{ color: 'black', whiteSpace: 'nowrap' }}>End Time</Typography>
+                <Typography
+                  sx={{
+                    color: !isAddMode ? 'text.primary' : 'text.secondary',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  End Time
+                </Typography>
                 <TextField
                   select
                   value={endTime.hour}

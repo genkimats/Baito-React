@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from 'react';
-import { BaitoContext } from '../context/BaitoProvider';
+import { BaitoContext } from '../context/BaitoContext';
 import '../css/SettingsPage.css';
 import {
   Paper,

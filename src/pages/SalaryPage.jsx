@@ -1,5 +1,5 @@
 import '../css/SalaryPage.css';
-import { BaitoContext } from '../context/BaitoProvider';
+import { BaitoContext } from '../context/BaitoContext';
 import SalaryDisplay from '../components/SalaryDisplay';
 import DailySalariesChart from '../components/DailySalariesChart';
 import MonthlySalariesChart from '../components/MonthlySalariesChart';

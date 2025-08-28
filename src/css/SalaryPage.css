@@ -6,7 +6,7 @@
   grid-template-rows: min-content min-content min-content;
   padding-top: 20px;
   grid-gap: 20px;
-  background-color: rgb(245, 245, 245);
+  /* background-color: rgb(245, 245, 245); */
 }
 
 .monthly-salary {
